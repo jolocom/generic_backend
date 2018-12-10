@@ -1,15 +1,13 @@
 {
   "compilerOptions": {
-    "types":["node"],
     "baseUrl": ".",
     "outDir": "./build/",
-    "module": "es2015",
-    "target": "es2017",
-    "lib": ["dom", "es2017"],
+    "target": "ES5",
+    "lib": ["es2017"],
     "sourceMap": true,
     "jsx": "react",
     "moduleResolution": "node",
-    "rootDirs": ["src", "server"],
+    "rootDirs": ["src"],
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
@@ -20,14 +18,6 @@
   },
   "exclude": [
     "node_modules",
-    "build",
-    "scripts",
-    "acceptance-tests",
-    "webpack",
-    "jest",
-    "src/setupTests.ts"
-  ],
-  "include": [
-    "./src/**/*"
+    "build"
   ]
 }
