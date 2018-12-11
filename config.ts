@@ -17,3 +17,5 @@ export const credentialRequirements = [
     constraints: [] as IConstraint[]
   }
 ]
+
+export const credentialOffer = [{}]

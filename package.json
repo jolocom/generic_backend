@@ -32,6 +32,7 @@
     "@types/redis": "^2.8.6",
     "@types/socket.io": "^1.4.38",
     "@types/socket.io-client": "^1.4.32",
+    "prettier": "^1.15.3",
     "typescript": "^3.0.1"
   },
   "jest": {
