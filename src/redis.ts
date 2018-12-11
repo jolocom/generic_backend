@@ -1,7 +1,8 @@
 import { promisify } from 'util'
 const redis = require('redis')
 
-export const configureRedisClient = () => {
+// TODO Get from redis config
+export const initializeRedisClient = () => {
   const client = redis.createClient({
     host: 'localhost',
     port: 6379

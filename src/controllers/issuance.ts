@@ -1,14 +1,14 @@
 import {password} from '../../config'
-import {ControllerArguments} from './registration'
-import {Response, Request} from 'express'
+import {Request, Response} from 'express'
+import {IdentityWallet} from 'jolocom-lib/js/identityWallet/identityWallet'
+import {RedisApi} from '../types'
 
 const generateCredentialOffer = async (
-  options: ControllerArguments,
+  identityWallet: IdentityWallet,
+  redis: RedisApi,
   req: Request,
   res: Response
 ) => {
-  const {identityWallet} = options
-
   try {
     const credOffer = await identityWallet.create.interactionTokens.request.offer(
       {
@@ -19,18 +19,20 @@ const generateCredentialOffer = async (
       password
     )
 
-    return res.status(200).send({token: credOffer.encode()})
+    const token = credOffer.encode()
+    await redis.setAsync(credOffer.nonce, token)
+    return res.status(200).send({token})
   } catch (err) {
     return res.status(500).send({error: err.message})
   }
 }
 
 const consumeCredentialOfferResponse = async (
-  options: ControllerArguments,
+  identityWallet: IdentityWallet,
+  redis: RedisApi,
   req: Request,
   res: Response
 ) => {
-  console.log('YES')
 }
 
 export const issuance = {
