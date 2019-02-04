@@ -56,6 +56,7 @@ export const configureSockets = (
     const credentialRequest = await identityWallet.create.interactionTokens.request.share(
       {
         callbackURL,
+        // @ts-ignore
         credentialRequirements
       },
       password

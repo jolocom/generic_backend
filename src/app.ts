@@ -9,10 +9,10 @@ import * as cors from 'cors'
 
 export const getConfiguredApp = () => {
   const expressApp = express()
-  expressApp.use(express.static('dist'))
-  expressApp.use(bodyParser.urlencoded({ extended: false }))
-  expressApp.use(bodyParser.json())
   expressApp.use(cors())
+  expressApp.use(express.static('dist'))
+  expressApp.use(bodyParser.json())
+  expressApp.use(bodyParser.urlencoded({ extended: false }))
 
   return expressApp
 }
