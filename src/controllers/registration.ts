@@ -16,6 +16,7 @@ const generateCredentialShareRequest = async (
 ) => {
   const callbackURL = `${serviceUrl}/authenticate`;
 
+  // TODO Move to util / config loader
   const parsedRequirements = credentialRequirements.map(({ type, issuer }) => ({
     type,
     constraints: (issuer
@@ -32,7 +33,7 @@ const generateCredentialShareRequest = async (
   );
 
   const token = credentialRequest.encode();
-  await redis.setAsync(credentialRequest.nonce, token);
+  await redis.setAsync(credentialRequest.nonce, JSON.stringify({request: token, status: 'pending'}));
   res.send({ token, identifier: credentialRequest.nonce });
 };
 

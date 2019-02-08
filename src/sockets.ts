@@ -22,14 +22,9 @@ export const configureSockets = (
 
   authnSocket.on("connection", async socket => {
     const authUrl = `${serviceUrl}/authenticate`;
+
     // @ts-ignore
     const { token, identifier } = await fetch(authUrl).then(r => r.json());
-
-    await redisApi.setAsync(
-      identifier,
-      JSON.stringify({ identifier, request: token, status: "pending" })
-    );
-
     const qrCode = await new SSO().JWTtoQR(token);
 
     socket.emit("qrCode", { qrCode, identifier });
