@@ -7,7 +7,7 @@ export const generateValidCredentialResponse = async () => {
   const registry = JolocomLib.registries.jolocom.create();
   const vaultedKeyProvider = new JolocomLib.KeyProvider(seed, password);
 
-  const { token } = (await axios.get(`${serviceUrl}/authenticate`)).data;
+  const { token } = (await axios.get(`${serviceUrl}/authenticate/Email`)).data;
 
   const iw = await registry.authenticate(vaultedKeyProvider, {
     derivationPath: JolocomLib.KeyTypes.jolocomIdentityKey,
@@ -18,7 +18,7 @@ export const generateValidCredentialResponse = async () => {
   const cred = await iw.create.signedCredential({
     subject: credentialRequest.issuer,
     claim: {
-      email: 'temst'
+      email: 'test'
     },
     metadata: claimsMetadata.emailAddress
   }, password)
@@ -36,7 +36,3 @@ export const generateValidCredentialResponse = async () => {
     token: credentialResponse.encode()
   });
 };
-
-generateValidCredentialResponse()
-  .then(res => console.log(res))
-  .catch(err => console.log(err));

@@ -14,7 +14,7 @@ const generateCredentialShareRequest = async (
   req: Request,
   res: Response
 ) => {
-  const callbackURL = `${serviceUrl}/authentication`;
+  const callbackURL = `${serviceUrl}/authenticate`;
 
   const parsedRequirements = credentialRequirements.map(({ type, issuer }) => ({
     type,
@@ -33,7 +33,7 @@ const generateCredentialShareRequest = async (
 
   const token = credentialRequest.encode();
   await redis.setAsync(credentialRequest.nonce, token);
-  res.send({ token });
+  res.send({ token, identifier: credentialRequest.nonce });
 };
 
 const consumeCredentialShareResponse = async (
@@ -49,24 +49,20 @@ const consumeCredentialShareResponse = async (
       token
     );
 
-    const credentialRequestJWT = await redis.getAsync(credentialResponse.nonce);
+    const { request: requestJWT } = JSON.parse(
+      await redis.getAsync(credentialResponse.nonce)
+    );
 
-    if (!credentialRequestJWT) {
-      return res.status(401).send("Corresponding request token not found");
+    if (!requestJWT) {
+      sendUnauthorizedMessage(res, "Corresponding request token not found");
     }
 
     const credentialRequest = await JolocomLib.parse.interactionToken.fromJWT(
-      credentialRequestJWT
+      requestJWT
     );
 
-    console.log(credentialResponse.toJSON())
-
     if (!(await JolocomLib.util.validateDigestable(credentialResponse))) {
-      return res.status(401).send("Invalid signature on interaction token");
-    }
-
-    if (!credentialResponse.interactionToken.suppliedCredentials.length) {
-      return res.status(401).send("No credentials provided");
+      sendUnauthorizedMessage(res, "Invalid signature on interaction token");
     }
 
     if (
@@ -74,11 +70,10 @@ const consumeCredentialShareResponse = async (
         credentialRequest.interactionToken
       )
     ) {
-      return res
-        .status(401)
-        .send(
-          "The supplied credentials do not match the types of the requested credentials"
-        );
+      sendUnauthorizedMessage(
+        res,
+        "The supplied credentials do not match the types of the requested credentials"
+      );
     }
 
     const data = {
@@ -87,17 +82,19 @@ const consumeCredentialShareResponse = async (
       status: "success"
     };
 
-    console.log(data)
-
     await redis.setAsync(
       credentialResponse.nonce,
       JSON.stringify({ status: "success", data })
     );
     return res.status(200).send();
   } catch (err) {
+    console.log(err);
     return res.status(401).send(err.message);
   }
 };
+
+export const sendUnauthorizedMessage = (res: Response, message: string) =>
+  res.status(401).send(message);
 
 export const registration = {
   generateCredentialShareRequest,

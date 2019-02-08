@@ -1,82 +1,69 @@
-import { SSO } from 'jolocom-lib/js/sso/sso'
-import * as io from 'socket.io'
-import { credentialRequirements, serviceUrl } from '../config'
-import * as http from 'http'
-import { DbWatcher } from './dbWatcher'
-import { IdentityWallet } from 'jolocom-lib/js/identityWallet/identityWallet'
-import { RedisApi } from './types'
-const SHA3 = require('sha3')
+import { SSO } from "jolocom-lib/js/sso/sso";
+import * as io from "socket.io";
+import { serviceUrl } from "../config";
+import * as http from "http";
+import { DbWatcher } from "./dbWatcher";
+import { IdentityWallet } from "jolocom-lib/js/identityWallet/identityWallet";
+import { RedisApi } from "./types";
+import * as fetch from "isomorphic-unfetch";
+import { Socket } from "socket.io";
 
 export const configureSockets = (
   server: http.Server,
   identityWallet: IdentityWallet,
-  password: string,
-  dbWatcher: DbWatcher,
-  redisApi: RedisApi
+  redisApi: RedisApi,
+  dbWatcher: DbWatcher
 ) => {
-  const { getAsync, delAsync } = redisApi
+  const baseSocket = io(server);
+  baseSocket.origins(["http://localhost:3000"]);
 
-  const baseSocket = io(server).origins('*:*')
+  const authnSocket = baseSocket.of("/authn");
+  const receiveCredSocket = baseSocket.of("/receive");
 
-  const authQrCodeSocket = baseSocket.of('/qr-code')
-  const receiveQrCodeSocket = baseSocket.of('/qr-receive')
-  const dataSocket = baseSocket.of('/sso-status')
+  authnSocket.on("connection", async socket => {
+    const authUrl = `${serviceUrl}/authenticate`;
+    // @ts-ignore
+    const { token, identifier } = await fetch(authUrl).then(r => r.json());
 
-  receiveQrCodeSocket.on('connection', async socket => {
-    const { did, answer } = socket.handshake.query
+    await redisApi.setAsync(
+      identifier,
+      JSON.stringify({ identifier, request: token, status: "pending" })
+    );
 
-    const didHash = SHA3.SHA3Hash()
-    didHash.update(did)
-    await redisApi.setAsync(`ans:${didHash.digest('hex')}`, answer)
+    const qrCode = await new SSO().JWTtoQR(token);
 
-    const credOfferRequest = await identityWallet.create.interactionTokens.request.offer(
-      {
-        instant: true,
-        requestedInput: {},
-        callbackURL: `${serviceUrl}/receive/`
-      },
-      password
-    )
+    socket.emit("qrCode", { qrCode, identifier });
+    watchDbForUpdate(identifier, dbWatcher, redisApi, socket);
+  });
 
-    console.log(credOfferRequest.encode())
-    const qrCode = await new SSO().JWTtoQR(credOfferRequest.encode())
-    socket.emit(did, qrCode)
-  })
+  receiveCredSocket.on("connection", async socket => {
+    const {credentialType, ...data} = socket.handshake.query;
+    const recUrl = `${serviceUrl}/receive/`;
 
-  /**
-   * @description Used by the frontend to request credential request QR codes
-   * @param {string} userId - The session identifier
-   * @emits qrCode
-   */
+    // @ts-ignore
+    const { token, identifier } = await fetch(recUrl).then(r => r.json());
 
-  authQrCodeSocket.on('connection', async socket => {
-    const { userId } = socket.handshake.query
+    await redisApi.setAsync(
+      identifier,
+      JSON.stringify({ credentialType, ...data, token })
+    );
 
-    const callbackURL = `${serviceUrl}/authentication/${userId}`
-    const credentialRequest = await identityWallet.create.interactionTokens.request.share(
-      {
-        callbackURL,
-        // @ts-ignore
-        credentialRequirements
-      },
-      password
-    )
+    const qrCode = await new SSO().JWTtoQR(token);
+    socket.emit("qrCode", { qrCode, identifier });
+    watchDbForUpdate(identifier, dbWatcher, redisApi, socket);
+  });
+};
 
-    /** Encoded credential request is saved for validation purposes later */
-    await redisApi.setAsync(userId, JSON.stringify({ userId, request: credentialRequest.encode(), status: 'pending' }))
-    const qrCode = await new SSO().JWTtoQR(credentialRequest.encode())
-
-    console.log(`[DEBUG] : JWT for ${userId} : ${credentialRequest.encode()}`)
-    socket.emit(userId, qrCode)
-  })
-
-  dataSocket.on('connection', async socket => {
-    const { userId } = socket.handshake.query
-    dbWatcher.addSubscription(userId)
-    dbWatcher.on(userId, async () => {
-      const userData = await getAsync(userId)
-      await delAsync(userId)
-      socket.emit(userId, userData)
-    })
-  })
-}
+const watchDbForUpdate = (
+  identifier: string,
+  dbWatcher: DbWatcher,
+  redisApi: RedisApi,
+  socket: Socket
+) => {
+  dbWatcher.addSubscription(identifier);
+  dbWatcher.on(identifier, async () => {
+    const userData = await redisApi.getAsync(identifier);
+    await redisApi.delAsync(identifier);
+    socket.emit(identifier, userData);
+  });
+};

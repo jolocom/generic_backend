@@ -578,13 +578,9 @@
     "@types/express-serve-static-core" "*"
     "@types/mime" "*"
 
-"@types/socket.io-client@^1.4.32":
-  version "1.4.32"
-  resolved "https://registry.yarnpkg.com/@types/socket.io-client/-/socket.io-client-1.4.32.tgz#988a65a0386c274b1c22a55377fab6a30789ac14"
-
-"@types/socket.io@^1.4.38":
-  version "1.4.40"
-  resolved "https://registry.yarnpkg.com/@types/socket.io/-/socket.io-1.4.40.tgz#4f6955a8bdab66f8af47edcebea038f89aea7ad2"
+"@types/socket.io@^2.1.2":
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/@types/socket.io/-/socket.io-2.1.2.tgz#7165c2587cc3b86b44aa78e2a0060140551de211"
   dependencies:
     "@types/node" "*"
 
@@ -1378,9 +1374,9 @@ cred-types-jolocom-core@^0.0.9:
   version "0.0.9"
   resolved "https://registry.yarnpkg.com/cred-types-jolocom-core/-/cred-types-jolocom-core-0.0.9.tgz#6d3a0a0b59838ec68f6e7fdf0ff234b349a1f42a"
 
-cred-types-jolocom-demo@^0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/cred-types-jolocom-demo/-/cred-types-jolocom-demo-0.0.1.tgz#2ebfb162a342982d802c25eca2d075240e873849"
+cred-types-jolocom-demo@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/cred-types-jolocom-demo/-/cred-types-jolocom-demo-0.1.0.tgz#774b5aa16825cd5787162f0289dc6741d4061d88"
 
 cross-spawn@^6.0.0:
   version "6.0.5"
@@ -2643,6 +2639,13 @@ isomorphic-fetch@^2.2.0:
     node-fetch "^1.0.1"
     whatwg-fetch ">=0.10.0"
 
+isomorphic-unfetch@3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/isomorphic-unfetch/-/isomorphic-unfetch-3.0.0.tgz#de6d80abde487b17de2c400a7ef9e5ecc2efb362"
+  dependencies:
+    node-fetch "^2.2.0"
+    unfetch "^4.0.0"
+
 isstream@~0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/isstream/-/isstream-0.1.2.tgz#47e63f7af55afa6f92e1500e690eb8b8529c099a"
@@ -2654,9 +2657,9 @@ isurl@^1.0.0-alpha5:
     has-to-string-tag-x "^1.2.0"
     is-object "^1.0.1"
 
-jolocom-lib@^2.2.7:
-  version "2.2.7"
-  resolved "https://registry.yarnpkg.com/jolocom-lib/-/jolocom-lib-2.2.7.tgz#845ead3ace7d1b2da8d266eb7e9cc88b966977a0"
+jolocom-lib@^2.2.9:
+  version "2.2.9"
+  resolved "https://registry.yarnpkg.com/jolocom-lib/-/jolocom-lib-2.2.9.tgz#3529f8760c22ea33e4b3f48f0b1875ccbc57dbf0"
   dependencies:
     base64url "^3.0.0"
     bip32 "^1.0.2"
@@ -3205,7 +3208,7 @@ node-fetch@^1.0.1:
     encoding "^0.1.11"
     is-stream "^1.0.1"
 
-node-fetch@^2.1.2:
+node-fetch@^2.1.2, node-fetch@^2.2.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.3.0.tgz#1a1d940bbfb916a1d3e0219f037e89e71f8c5fa5"
 
@@ -4038,7 +4041,7 @@ socket.io-adapter@~1.1.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/socket.io-adapter/-/socket.io-adapter-1.1.1.tgz#2a805e8a14d6372124dd9159ad4502f8cb07f06b"
 
-socket.io-client@2.2.0, socket.io-client@^2.1.1:
+socket.io-client@2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/socket.io-client/-/socket.io-client-2.2.0.tgz#84e73ee3c43d5020ccc1a258faeeb9aec2723af7"
   dependencies:
@@ -4589,6 +4592,10 @@ unbzip2-stream@^1.0.9:
 underscore@1.8.3:
   version "1.8.3"
   resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.8.3.tgz#4f3fb53b106e6097fcf9cb4109f2a5e9bdfa5022"
+
+unfetch@^4.0.0:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/unfetch/-/unfetch-4.0.1.tgz#8750c4c7497ade75d40387d7dbc4ba024416b8f6"
 
 unicode-canonical-property-names-ecmascript@^1.0.4:
   version "1.0.4"
