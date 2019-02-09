@@ -34,5 +34,11 @@ export const setStatusDone = (redis: RedisApi, key: string, data: any = {}) =>
 export const setDataFromUiForms = (redis: RedisApi, key: string, data: string) =>
   redis.setAsync(`${key}_formData`, data);
 
-export const getDataFromUiForms = async (redis: RedisApi, key: string) =>
-  JSON.parse(await redis.getAsync(`${key}_formData`))
+export const getDataFromUiForms = async (redis: RedisApi, key: string) => {
+  const derivedKey = `${key}_formData`
+  const data = JSON.parse(await redis.getAsync(derivedKey)) || {}
+
+  await redis.delAsync(derivedKey)
+
+  return data
+}

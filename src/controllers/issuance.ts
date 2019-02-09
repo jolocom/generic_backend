@@ -44,8 +44,7 @@ const consumeCredentialOfferResponse = (
   }
 
   const credentialOfferResponse = req.interactionToken;
-  const claim =
-    (await getDataFromUiForms(redis, credentialOfferResponse.nonce)) || {};
+  const claim = await getDataFromUiForms(redis, credentialOfferResponse.nonce);
 
   const credential = await identityWallet.create.signedCredential(
     {

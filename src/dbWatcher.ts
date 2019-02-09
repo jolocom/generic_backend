@@ -2,7 +2,7 @@ import { EventEmitter } from "events"
 
 export class DbWatcher extends EventEmitter {
   private watchedKeys: string[] = []
-  private readonly  interval: number = 2000
+  private readonly  interval = 2000
   private readonly getAsync: (key: string) => string
 
   constructor(getAsyncImplementation: (key: string) => string) {
