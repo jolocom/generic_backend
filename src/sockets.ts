@@ -5,9 +5,19 @@ import * as http from "http";
 import { DbWatcher } from "./dbWatcher";
 import { IdentityWallet } from "jolocom-lib/js/identityWallet/identityWallet";
 import { RedisApi } from "./types";
-import * as fetch from "isomorphic-unfetch";
+import axios from "axios";
 import { Socket } from "socket.io";
-import { setDataFromUiForms } from './helpers'
+import { setDataFromUiForms } from "./helpers";
+
+export enum SocketEvents {
+  qrCode = 'qrCode',
+  connection = 'connection'
+}
+
+export enum Endpoints {
+  authn = '/authenticate/',
+  receive = '/receive/'
+}
 
 export const configureSockets = (
   server: http.Server,
@@ -18,34 +28,38 @@ export const configureSockets = (
   const baseSocket = io(server);
   baseSocket.origins(["http://localhost:3000"]);
 
-  const authnSocket = baseSocket.of("/authn");
-  const receiveCredSocket = baseSocket.of("/receive");
+  const authnSocket = baseSocket.of(Endpoints.authn);
+  const receiveCredSocket = baseSocket.of(Endpoints.receive);
 
-  authnSocket.on("connection", async socket => {
-    const authUrl = `${serviceUrl}/authenticate`;
-
-    // @ts-ignore
-    const { token, identifier } = await fetch(authUrl).then(r => r.json());
-    const qrCode = await new SSO().JWTtoQR(token);
-
-    socket.emit("qrCode", { qrCode, identifier });
-    watchDbForUpdate(identifier, dbWatcher, redis, socket);
-  });
-
-  receiveCredSocket.on("connection", async socket => {
-    const {credentialType, data} = socket.handshake.query;
-    const recUrl = `${serviceUrl}/receive/${credentialType}`;
-
-    // @ts-ignore TODO Replace with another fetch implementation / axios
-    const { token, identifier } = await fetch(recUrl).then(r => r.json());
-
-    const qrCode = await new SSO().JWTtoQR(token);
-    await setDataFromUiForms(redis, identifier, data)
-
-    socket.emit("qrCode", { qrCode, identifier });
-    watchDbForUpdate(identifier, dbWatcher, redis, socket);
-  });
+  authnSocket.on(SocketEvents.connection, authSocketConnectionHandler(dbWatcher, redis));
+  receiveCredSocket.on( SocketEvents.connection, credOfferSocketConnectionHandler(dbWatcher, redis));
 };
+
+const credOfferSocketConnectionHandler = (
+  dbWatcher: DbWatcher,
+  redis: RedisApi
+) => async (socket: Socket) => {
+  const { credentialType, data } = socket.handshake.query;
+  const { identifier, qrCode } = await getQrEncodedToken(`${Endpoints.receive}${credentialType}`)
+  await setDataFromUiForms(redis, identifier, data);
+
+  socket.emit(SocketEvents.qrCode, { qrCode, identifier });
+  watchDbForUpdate(identifier, dbWatcher, redis, socket);
+};
+
+const authSocketConnectionHandler = (
+  dbWatcher: DbWatcher,
+  redis: RedisApi
+) => async (socket: Socket) => {
+  const { identifier, qrCode } = await getQrEncodedToken(Endpoints.authn)
+  socket.emit(SocketEvents.qrCode, { qrCode, identifier });
+  watchDbForUpdate(identifier, dbWatcher, redis, socket);
+};
+
+const getQrEncodedToken = async (endpoint: string) => {
+  const { identifier, token } = (await axios.get(`${serviceUrl}${endpoint}`)).data;
+  return { identifier, qrCode: await new SSO().JWTtoQR(token)}
+}
 
 const watchDbForUpdate = (
   identifier: string,

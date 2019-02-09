@@ -1,11 +1,14 @@
-import {credentialOffers, password, serviceUrl} from '../../config'
-import {Request, Response} from 'express'
-import {IdentityWallet} from 'jolocom-lib/js/identityWallet/identityWallet'
-import {RedisApi} from '../types'
-import {JolocomLib} from 'jolocom-lib'
-import {keyIdToDid} from 'jolocom-lib/js/utils/helper'
-import {sendUnauthorizedMessage} from './registration'
-import {getDataFromUiForms, setStatusDone, setStatusPending} from '../helpers'
+import { credentialOffers, password, serviceUrl } from "../../config";
+import { Request, Response } from "express";
+import { IdentityWallet } from "jolocom-lib/js/identityWallet/identityWallet";
+import { RedisApi } from "../types";
+import { JolocomLib } from "jolocom-lib";
+import { keyIdToDid } from "jolocom-lib/js/utils/helper";
+import {
+  getDataFromUiForms,
+  setStatusDone,
+  setStatusPending
+} from "../helpers";
 
 const generateCredentialOffer = async (
   identityWallet: IdentityWallet,
@@ -13,7 +16,7 @@ const generateCredentialOffer = async (
   req: Request,
   res: Response
 ) => {
-  const {credentialType} = req.params
+  const { credentialType } = req.params;
 
   try {
     // TODO source from config
@@ -24,15 +27,15 @@ const generateCredentialOffer = async (
         instant: true
       },
       password
-    )
+    );
 
-    const token = credOffer.encode()
-    await setStatusPending(redis, credOffer.nonce, {token})
+    const token = credOffer.encode();
+    await setStatusPending(redis, credOffer.nonce, { request: token });
     return res.send({ token, identifier: credOffer.nonce });
   } catch (err) {
-    return res.status(500).send({error: err.message})
+    return res.status(500).send({ error: err.message });
   }
-}
+};
 
 const consumeCredentialOfferResponse = async (
   identityWallet: IdentityWallet,
@@ -40,58 +43,38 @@ const consumeCredentialOfferResponse = async (
   req: Request,
   res: Response
 ) => {
-  const { token: responseToken } = req.body
-  const { credentialType } = req.params
+  const { credentialType } = req.params;
 
   if (!credentialType || !credentialOffers[credentialType]) {
-    return sendUnauthorizedMessage(res, "Requested credential type is not supported")
+    return res.status(401).send("Requested credential type is not supported");
   }
 
-  try {
-    const credentialOfferResponse = await JolocomLib.parse.interactionToken.fromJWT(
-      responseToken
-    );
+  // @ts-ignore
+  const credentialOfferResponse = req.interactionToken;
+  const claim = await getDataFromUiForms(redis, credentialOfferResponse.nonce) || {};
 
-    // TODO READ AND DELETE
-    const { token: requestToken} = JSON.parse(await redis.getAsync(credentialOfferResponse.nonce))
-    const claim = await getDataFromUiForms(redis, credentialOfferResponse.nonce)
-
-    if (!requestToken) {
-      return sendUnauthorizedMessage(res, "Corresponding request token not found")
-    }
-
-    const credentialOffer = await JolocomLib.parse.interactionToken.fromJWT(
-      requestToken
-    );
-
-    if (!(await JolocomLib.util.validateDigestable(credentialOffer))) {
-      return sendUnauthorizedMessage(res, "Invalid signature on interaction token")
-    }
-
-    const credential = await identityWallet.create.signedCredential({
+  const credential = await identityWallet.create.signedCredential(
+    {
       metadata: credentialOffers[credentialType],
       claim,
       subject: keyIdToDid(credentialOfferResponse.issuer)
-    }, password)
+    },
+    password
+  );
 
-    const credentialReceive = await identityWallet.create.interactionTokens.response.issue(
-      {
-        signedCredentials: [credential.toJSON()],
-      },
-      password,
-      credentialOfferResponse
-    );
+  const credentialReceive = await identityWallet.create.interactionTokens.response.issue(
+    {
+      signedCredentials: [credential.toJSON()]
+    },
+    password,
+    credentialOfferResponse
+  );
 
-    await setStatusDone(redis, credentialOfferResponse.nonce)
-    // await redis.setAsync(credentialOfferResponse.nonce, JSON.stringify({ status: 'success', data: credentialReceive.encode() }));
-    return res.json({ token: credentialReceive.encode() });
-  } catch (err) {
-    console.log(err)
-    return res.status(401).send(err.message);
-  }
-}
+  await setStatusDone(redis, credentialOfferResponse.nonce);
+  return res.json({ token: credentialReceive.encode() });
+};
 
 export const issuance = {
   generateCredentialOffer,
   consumeCredentialOfferResponse
-}
+};
