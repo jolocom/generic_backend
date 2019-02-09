@@ -1,4 +1,7 @@
 import { CredentialResponse } from "jolocom-lib/js/interactionTokens/credentialResponse";
+import {constraintFunctions} from 'jolocom-lib/js/interactionTokens/credentialRequest'
+import {IConstraint} from 'jolocom-lib/js/interactionTokens/interactionTokens.types'
+import {RedisApi} from '../types'
 
 export const extractDataFromClaims = (
   credentialResponse: CredentialResponse
@@ -13,3 +16,23 @@ export const extractDataFromClaims = (
     .filter(key => !reserved.includes(key))
     .reduce((acc, key) => ({ ...acc, [key]: accumulatedData[key] }), {});
 };
+
+export const generateRequirementsFromConfig = (credentialRequierements: any) =>
+  credentialRequierements.map(({type, issuer }: any) => ({
+    type,
+    constraints: (issuer
+      ? [constraintFunctions.is("issuer", issuer)]
+      : []) as IConstraint[]
+  }));
+
+export const setStatusPending = (redis: RedisApi, key: string, data: any) =>
+  redis.setAsync(key, JSON.stringify({...data, status: 'pending'}));
+
+export const setStatusDone = (redis: RedisApi, key: string, data: any = {}) =>
+  redis.setAsync(key, JSON.stringify({...data, status: 'success'}));
+
+export const setDataFromUiForms = (redis: RedisApi, key: string, data: string) =>
+  redis.setAsync(`${key}_formData`, data);
+
+export const getDataFromUiForms = async (redis: RedisApi, key: string) =>
+  JSON.parse(await redis.getAsync(`${key}_formData`))

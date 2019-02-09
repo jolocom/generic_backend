@@ -13,7 +13,7 @@ export const configureRoutes = (
   .get((req, res) => registration.generateCredentialShareRequest(identityWallet, redis, req, res))
   .post((req, res) => registration.consumeCredentialShareResponse(identityWallet, redis, req, res))
 
-  app.route('/receive/')
-  .get((req, res) => issuance.generateCredentialOffer(identityWallet, req, res))
+  app.route('/receive/:credentialType')
+  .get((req, res) => issuance.generateCredentialOffer(identityWallet, redis, req, res))
   .post((req, res) => issuance.consumeCredentialOfferResponse(identityWallet, redis, req, res))
 }

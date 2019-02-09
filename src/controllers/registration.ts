@@ -4,9 +4,7 @@ import { IdentityWallet } from "jolocom-lib/js/identityWallet/identityWallet";
 
 import { RedisApi } from "../types";
 import { credentialRequirements, password, serviceUrl } from "../../config";
-import { extractDataFromClaims } from "../helpers/";
-import { constraintFunctions } from "jolocom-lib/js/interactionTokens/credentialRequest";
-import { IConstraint } from "jolocom-lib/js/interactionTokens/interactionTokens.types";
+import {extractDataFromClaims, generateRequirementsFromConfig, setStatusDone, setStatusPending} from '../helpers/'
 
 const generateCredentialShareRequest = async (
   identityWallet: IdentityWallet,
@@ -16,24 +14,16 @@ const generateCredentialShareRequest = async (
 ) => {
   const callbackURL = `${serviceUrl}/authenticate`;
 
-  // TODO Move to util / config loader
-  const parsedRequirements = credentialRequirements.map(({ type, issuer }) => ({
-    type,
-    constraints: (issuer
-      ? [constraintFunctions.is("issuer", issuer)]
-      : []) as IConstraint[]
-  }));
-
   const credentialRequest = await identityWallet.create.interactionTokens.request.share(
     {
       callbackURL,
-      credentialRequirements: parsedRequirements
+      credentialRequirements: generateRequirementsFromConfig(credentialRequirements)
     },
     password
   );
 
   const token = credentialRequest.encode();
-  await redis.setAsync(credentialRequest.nonce, JSON.stringify({request: token, status: 'pending'}));
+  await setStatusPending(redis, credentialRequest.nonce, {request: token})
   res.send({ token, identifier: credentialRequest.nonce });
 };
 
@@ -80,13 +70,9 @@ const consumeCredentialShareResponse = async (
     const data = {
       ...extractDataFromClaims(credentialResponse.interactionToken),
       did: credentialResponse.issuer,
-      status: "success"
     };
 
-    await redis.setAsync(
-      credentialResponse.nonce,
-      JSON.stringify({ status: "success", data })
-    );
+    await setStatusDone(redis, credentialResponse.nonce, data)
     return res.status(200).send();
   } catch (err) {
     console.log(err);
