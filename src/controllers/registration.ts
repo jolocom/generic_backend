@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { IdentityWallet } from "jolocom-lib/js/identityWallet/identityWallet";
 
-import { RedisApi } from "../types";
+import {RedisApi, RequestWithInteractionTokens} from '../types'
 import { credentialRequirements, password, serviceUrl } from "../../config";
 import {
   extractDataFromClaims,
@@ -9,6 +9,8 @@ import {
   setStatusDone,
   setStatusPending
 } from "../helpers/";
+import {CredentialResponse} from 'jolocom-lib/js/interactionTokens/credentialResponse'
+import {CredentialRequest} from 'jolocom-lib/js/interactionTokens/credentialRequest'
 
 const generateCredentialShareRequest = async (
   identityWallet: IdentityWallet,
@@ -34,14 +36,11 @@ const generateCredentialShareRequest = async (
 
 const consumeCredentialShareResponse = async (
   redis: RedisApi,
-  req: Request,
+  req: RequestWithInteractionTokens,
   res: Response
 ) => {
-  // @ts-ignore
-  const response = req.interactionToken.interactionToken;
-  // @ts-ignore
-  const request = req.requestToken.interactionToken;
-  // @ts-ignore
+  const response = req.interactionToken.interactionToken as CredentialResponse
+  const request = req.requestToken.interactionToken as CredentialRequest
   const {issuer, nonce} = req.requestToken
 
   try {

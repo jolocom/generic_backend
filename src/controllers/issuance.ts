@@ -1,8 +1,7 @@
 import { credentialOffers, password, serviceUrl } from "../../config";
 import { Request, Response } from "express";
 import { IdentityWallet } from "jolocom-lib/js/identityWallet/identityWallet";
-import { RedisApi } from "../types";
-import { JolocomLib } from "jolocom-lib";
+import {RedisApi, RequestWithInteractionTokens} from '../types'
 import { keyIdToDid } from "jolocom-lib/js/utils/helper";
 import {
   getDataFromUiForms,
@@ -40,7 +39,7 @@ const generateCredentialOffer = async (
 const consumeCredentialOfferResponse = async (
   identityWallet: IdentityWallet,
   redis: RedisApi,
-  req: Request,
+  req: RequestWithInteractionTokens,
   res: Response
 ) => {
   const { credentialType } = req.params;
@@ -49,7 +48,6 @@ const consumeCredentialOfferResponse = async (
     return res.status(401).send("Requested credential type is not supported");
   }
 
-  // @ts-ignore
   const credentialOfferResponse = req.interactionToken;
   const claim = await getDataFromUiForms(redis, credentialOfferResponse.nonce) || {};
 
