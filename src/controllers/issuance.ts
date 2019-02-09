@@ -18,7 +18,6 @@ const generateCredentialOffer = async (
   const { credentialType } = req.params;
 
   try {
-    // TODO source from config
     const credOffer = await identityWallet.create.interactionTokens.request.offer(
       {
         callbackURL: `${serviceUrl}/receive/${credentialType}`,

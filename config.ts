@@ -14,15 +14,18 @@ export const password = "correct horse battery staple";
 /* Where is your service deployed. E.g. https://demo-sso.jolocom.com, used by the frontend */
 export const serviceUrl = "http://192.168.2.109:9000";
 
-/* What credentials do you require during authentication, and associated constraints */
+/* Credentials required during authentication */
 export const credentialRequirements = [
   {
-    name: claimsMetadata.emailAddress.name,
-    type: claimsMetadata.emailAddress.type,
-    issuer: ''
+    metadata: claimsMetadata.emailAddress,
+    issuer: '' // A did can be included here to whitelist the issuer of the requested credential
+  },
+  {
+    metadata: claimsMetadata.mobilePhoneNumber // If the field is empty, or omitted, any issuer will be accepted
   }
 ];
 
+/* Credentials offered by the service. Documentation on how to include custom credentials coming soon */
 export const credentialOffers = {
   email: claimsMetadata.emailAddress,
   name: claimsMetadata.name,
