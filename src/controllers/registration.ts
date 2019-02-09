@@ -12,9 +12,11 @@ import {
 import {CredentialResponse} from 'jolocom-lib/js/interactionTokens/credentialResponse'
 import {CredentialRequest} from 'jolocom-lib/js/interactionTokens/credentialRequest'
 
-const generateCredentialShareRequest = async (
+const generateCredentialShareRequest = (
   identityWallet: IdentityWallet,
   redis: RedisApi,
+) => async (
+  req: RequestWithInteractionTokens,
   res: Response
 ) => {
   const callbackURL = `${serviceUrl}/authenticate`;
@@ -34,8 +36,9 @@ const generateCredentialShareRequest = async (
   res.send({ token, identifier: credentialRequest.nonce });
 };
 
-const consumeCredentialShareResponse = async (
+const consumeCredentialShareResponse = (
   redis: RedisApi,
+) => async (
   req: RequestWithInteractionTokens,
   res: Response
 ) => {

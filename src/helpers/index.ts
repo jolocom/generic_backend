@@ -18,8 +18,8 @@ export const extractDataFromClaims = (
 };
 
 export const generateRequirementsFromConfig = (credentialRequierements: any) =>
-  credentialRequierements.map(({type, issuer }: any) => ({
-    type,
+  credentialRequierements.map(({metadata, issuer }: any) => ({
+    type: metadata.type,
     constraints: (issuer
       ? [constraintFunctions.is("issuer", issuer)]
       : []) as IConstraint[]

@@ -1,10 +1,11 @@
 import { JolocomLib } from "jolocom-lib";
 import { password, seed, serviceUrl } from "../config";
-import axios from "axios";
+import axios, {AxiosResponse} from 'axios'
 import { claimsMetadata } from "cred-types-jolocom-core";
 import { Endpoints } from "./sockets";
 import { CredentialOffer } from "jolocom-lib/js/interactionTokens/credentialOffer";
 import { JSONWebToken } from "jolocom-lib/js/interactionTokens/JSONWebToken";
+import {Response} from 'express'
 
 const getIdentityWallet = async () => {
   const registry = JolocomLib.registries.jolocom.create();
@@ -72,5 +73,5 @@ export const testCredentialOffer = async () => {
     .catch(err => console.log(err));
 };
 
-// testCredentialReceive().then(console.log)
-// testCredentialOffer().then(res => console.log(res));
+testCredentialReceive().then((res: AxiosResponse) => console.log(res.status))
+testCredentialOffer().then((res:AxiosResponse) => console.log(res.status)).catch(err => console.log(err));

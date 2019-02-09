@@ -16,25 +16,19 @@ export const configureRoutes = (
 ) => {
   app
     .route(Endpoints.authn)
-    .get((req, res) =>
-      registration.generateCredentialShareRequest(identityWallet, redis, res)
-    )
+    .get(registration.generateCredentialShareRequest(identityWallet, redis))
     .post(
       validateSentInteractionToken,
       matchAgainstRequest(redis),
-      (req: RequestWithInteractionTokens, res) =>
-        registration.consumeCredentialShareResponse(redis, req, res)
+      registration.consumeCredentialShareResponse(redis)
     );
 
   app
     .route(`${Endpoints.receive}:credentialType`)
-    .get((req, res) =>
-      issuance.generateCredentialOffer(identityWallet, redis, req, res)
-    )
+    .get(issuance.generateCredentialOffer(identityWallet, redis))
     .post(
       validateSentInteractionToken,
       matchAgainstRequest(redis),
-      (req: RequestWithInteractionTokens, res) =>
-        issuance.consumeCredentialOfferResponse(identityWallet, redis, req, res)
+      issuance.consumeCredentialOfferResponse(identityWallet, redis)
     );
 };

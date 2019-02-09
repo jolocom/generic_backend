@@ -1,7 +1,7 @@
 import { credentialOffers, password, serviceUrl } from "../../config";
 import { Request, Response } from "express";
 import { IdentityWallet } from "jolocom-lib/js/identityWallet/identityWallet";
-import {RedisApi, RequestWithInteractionTokens} from '../types'
+import { RedisApi, RequestWithInteractionTokens } from "../types";
 import { keyIdToDid } from "jolocom-lib/js/utils/helper";
 import {
   getDataFromUiForms,
@@ -9,12 +9,10 @@ import {
   setStatusPending
 } from "../helpers";
 
-const generateCredentialOffer = async (
+const generateCredentialOffer = (
   identityWallet: IdentityWallet,
-  redis: RedisApi,
-  req: Request,
-  res: Response
-) => {
+  redis: RedisApi
+) => async (req: Request, res: Response) => {
   const { credentialType } = req.params;
 
   try {
@@ -35,12 +33,10 @@ const generateCredentialOffer = async (
   }
 };
 
-const consumeCredentialOfferResponse = async (
+const consumeCredentialOfferResponse = (
   identityWallet: IdentityWallet,
-  redis: RedisApi,
-  req: RequestWithInteractionTokens,
-  res: Response
-) => {
+  redis: RedisApi
+) => async (req: RequestWithInteractionTokens, res: Response) => {
   const { credentialType } = req.params;
 
   if (!credentialType || !credentialOffers[credentialType]) {
@@ -48,7 +44,8 @@ const consumeCredentialOfferResponse = async (
   }
 
   const credentialOfferResponse = req.interactionToken;
-  const claim = await getDataFromUiForms(redis, credentialOfferResponse.nonce) || {};
+  const claim =
+    (await getDataFromUiForms(redis, credentialOfferResponse.nonce)) || {};
 
   const credential = await identityWallet.create.signedCredential(
     {

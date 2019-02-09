@@ -18,10 +18,7 @@ export const serviceUrl = "http://192.168.2.109:9000";
 export const credentialRequirements = [
   {
     metadata: claimsMetadata.emailAddress,
-    issuer: '' // A did can be included here to whitelist the issuer of the requested credential
-  },
-  {
-    metadata: claimsMetadata.mobilePhoneNumber // If the field is empty, or omitted, any issuer will be accepted
+    issuer: '' // Can be used to whitelist the issuer of requested credential. If empty, or omitted, all issuers are accepted
   }
 ];
 
