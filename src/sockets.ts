@@ -26,7 +26,7 @@ export const configureSockets = (
   dbWatcher: DbWatcher
 ) => {
   const baseSocket = io(server);
-  baseSocket.origins(["http://localhost:3000"]);
+  baseSocket.origins(["http://localhost:5000"]);
 
   const authnSocket = baseSocket.of(Endpoints.authn);
   const receiveCredSocket = baseSocket.of(Endpoints.receive);

@@ -1,32 +1,31 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import { IdentityWallet } from "jolocom-lib/js/identityWallet/identityWallet";
 
-import {RedisApi, RequestWithInteractionTokens} from '../types'
+import { RedisApi, RequestWithInteractionTokens } from "../types";
 import { credentialRequirements, password, serviceUrl } from "../../config";
 import {
+  applyValidationFunction,
   extractDataFromClaims,
   generateRequirementsFromConfig,
   setStatusDone,
-  setStatusPending
+  setStatusPending,
 } from "../helpers/";
-import {CredentialResponse} from 'jolocom-lib/js/interactionTokens/credentialResponse'
-import {CredentialRequest} from 'jolocom-lib/js/interactionTokens/credentialRequest'
+import { CredentialResponse } from "jolocom-lib/js/interactionTokens/credentialResponse";
+import { CredentialRequest } from "jolocom-lib/js/interactionTokens/credentialRequest";
+import { Endpoints } from "../sockets";
 
 const generateCredentialShareRequest = (
   identityWallet: IdentityWallet,
-  redis: RedisApi,
-) => async (
-  req: RequestWithInteractionTokens,
-  res: Response
-) => {
-  const callbackURL = `${serviceUrl}/authenticate`;
+  redis: RedisApi
+) => async (req: RequestWithInteractionTokens, res: Response) => {
+  const callbackURL = `${serviceUrl}${Endpoints.authn}`;
 
   const credentialRequest = await identityWallet.create.interactionTokens.request.share(
     {
       callbackURL,
-      credentialRequirements: generateRequirementsFromConfig(
-        credentialRequirements
-      )
+      credentialRequirements: [
+        generateRequirementsFromConfig(credentialRequirements["email"])
+      ]
     },
     password
   );
@@ -36,23 +35,30 @@ const generateCredentialShareRequest = (
   res.send({ token, identifier: credentialRequest.nonce });
 };
 
-const consumeCredentialShareResponse = (
-  redis: RedisApi,
-) => async (
+const consumeCredentialShareResponse = (redis: RedisApi) => async (
   req: RequestWithInteractionTokens,
   res: Response
 ) => {
-  const response = req.interactionToken.interactionToken as CredentialResponse
-  const request = req.requestToken.interactionToken as CredentialRequest
-  const {issuer, nonce} = req.requestToken
+  const response = req.interactionToken.interactionToken as CredentialResponse;
+  const request = req.requestToken.interactionToken as CredentialRequest;
+  const { issuer, nonce } = req.requestToken;
 
   try {
     if (!response.satisfiesRequest(request)) {
-      res
+      return res
         .status(401)
         .send(
           "The supplied credentials do not match the types of the requested credentials"
         );
+    }
+    const passesValidation = response.suppliedCredentials.every(
+      applyValidationFunction('email')
+    );
+
+    if (!passesValidation) {
+      return res
+        .status(401)
+        .send("The supplied data did not satisfy the validation requirements");
     }
 
     const data = {

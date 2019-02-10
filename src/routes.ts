@@ -2,7 +2,7 @@ import { Express } from "express";
 import { IdentityWallet } from "jolocom-lib/js/identityWallet/identityWallet";
 import { registration } from "./controllers/registration";
 import { issuance } from "./controllers/issuance";
-import { RedisApi, RequestWithInteractionTokens } from "./types";
+import { RedisApi } from "./types";
 import { Endpoints } from "./sockets";
 import {
   matchAgainstRequest,
