@@ -1,4 +1,4 @@
-import { Express } from "express";
+import { Express, Request } from "express";
 import { IdentityWallet } from "jolocom-lib/js/identityWallet/identityWallet";
 import { registration } from "./controllers/registration";
 import { issuance } from "./controllers/issuance";

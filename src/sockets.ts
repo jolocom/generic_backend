@@ -1,6 +1,6 @@
 import { SSO } from "jolocom-lib/js/sso/sso";
 import * as io from "socket.io";
-import { serviceUrl } from "../config";
+import {frontendUrl, serviceUrl} from '../config'
 import * as http from "http";
 import { DbWatcher } from "./dbWatcher";
 import { IdentityWallet } from "jolocom-lib/js/identityWallet/identityWallet";
@@ -26,7 +26,7 @@ export const configureSockets = (
   dbWatcher: DbWatcher
 ) => {
   const baseSocket = io(server);
-  baseSocket.origins(["http://localhost:5000"]);
+  baseSocket.origins([frontendUrl]);
 
   const authnSocket = baseSocket.of(Endpoints.authn);
   const receiveCredSocket = baseSocket.of(Endpoints.receive);

@@ -2,13 +2,18 @@ import { Response } from "express";
 import { IdentityWallet } from "jolocom-lib/js/identityWallet/identityWallet";
 
 import { RedisApi, RequestWithInteractionTokens } from "../types";
-import { credentialRequirements, password, serviceUrl } from "../../config";
+import {
+  credentialRequirements,
+  currentCredentialRequirements,
+  password,
+  serviceUrl
+} from "../../config";
 import {
   applyValidationFunction,
   extractDataFromClaims,
   generateRequirementsFromConfig,
   setStatusDone,
-  setStatusPending,
+  setStatusPending
 } from "../helpers/";
 import { CredentialResponse } from "jolocom-lib/js/interactionTokens/credentialResponse";
 import { CredentialRequest } from "jolocom-lib/js/interactionTokens/credentialRequest";
@@ -23,9 +28,18 @@ const generateCredentialShareRequest = (
   const credentialRequest = await identityWallet.create.interactionTokens.request.share(
     {
       callbackURL,
-      credentialRequirements: [
-        generateRequirementsFromConfig(credentialRequirements["email"])
-      ]
+      credentialRequirements: currentCredentialRequirements.reduce(
+        (acc, credentialType) =>
+          credentialRequirements[credentialType]
+            ? [
+                ...acc,
+                generateRequirementsFromConfig(
+                  credentialRequirements[credentialType]
+                )
+              ]
+            : acc,
+        []
+      )
     },
     password
   );
@@ -52,7 +66,7 @@ const consumeCredentialShareResponse = (redis: RedisApi) => async (
         );
     }
     const passesValidation = response.suppliedCredentials.every(
-      applyValidationFunction('email')
+      applyValidationFunction("name")
     );
 
     if (!passesValidation) {
