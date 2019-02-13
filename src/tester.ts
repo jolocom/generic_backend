@@ -73,5 +73,5 @@ export const testCredentialOffer = async () => {
     .catch(err => console.log(err));
 };
 
-testCredentialReceive().then((res: AxiosResponse) => console.log(res.status))
+// testCredentialReceive().then((res: AxiosResponse) => console.log(res.status))
 testCredentialOffer().then((res:AxiosResponse) => console.log(res.status)).catch(err => console.log(err));

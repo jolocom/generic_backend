@@ -65,8 +65,9 @@ const consumeCredentialShareResponse = (redis: RedisApi) => async (
           "The supplied credentials do not match the types of the requested credentials"
         );
     }
+
     const passesValidation = response.suppliedCredentials.every(
-      applyValidationFunction("name")
+      applyValidationFunction
     );
 
     if (!passesValidation) {

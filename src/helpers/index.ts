@@ -1,9 +1,9 @@
 import { CredentialResponse } from "jolocom-lib/js/interactionTokens/credentialResponse";
 import { constraintFunctions } from "jolocom-lib/js/interactionTokens/credentialRequest";
 import { IConstraint } from "jolocom-lib/js/interactionTokens/interactionTokens.types";
-import {ICredentialReqSection, RedisApi} from '../types'
-import {SignedCredential} from 'jolocom-lib/js/credentials/signedCredential/signedCredential'
-import { credentialRequirements} from '../../config'
+import { ICredentialReqSection, RedisApi } from "../types";
+import { SignedCredential } from "jolocom-lib/js/credentials/signedCredential/signedCredential";
+import { credentialOffers, credentialRequirements } from "../../config";
 
 const { validate } = require("email-validator");
 
@@ -21,7 +21,10 @@ export const extractDataFromClaims = (
     .reduce((acc, key) => ({ ...acc, [key]: accumulatedData[key] }), {});
 };
 
-export const generateRequirementsFromConfig = ({ issuer, metadata }: ICredentialReqSection) => ({
+export const generateRequirementsFromConfig = ({
+  issuer,
+  metadata
+}: ICredentialReqSection) => ({
   type: metadata.type,
   constraints: (issuer
     ? [constraintFunctions.is("issuer", issuer)]
@@ -49,15 +52,17 @@ export const getDataFromUiForms = async (redis: RedisApi, key: string) => {
   return data;
 };
 
-export const applyValidationFunction = (credentialType: string) => (credential: SignedCredential) => {
-  const {credentialValidator} = credentialRequirements[credentialType]
+export const applyValidationFunction = (credential: SignedCredential) => {
+  const { credentialValidator } = Object.values(credentialRequirements).find(
+    ({ metadata }) => areArraysEqual(metadata.type, credential.type)
+  );
 
   if (!credentialValidator) {
-    return true
+    return true;
   }
 
-  return credentialValidator(credential)
-}
+  return credentialValidator(credential);
+};
 
 export const validateEmailCredential = (whitelistedValues: string[]) => ({
   claim
@@ -69,3 +74,11 @@ export const validateEmailCredential = (whitelistedValues: string[]) => ({
       ? validate(claim.email) && claim.email.endsWith(allowed)
       : whitelistedValues.includes(claim.email)
   );
+
+const areArraysEqual = (first: string[], second: string[]) => {
+  if (first.length !== second.length) {
+    return false;
+  }
+
+  return first.every((el, i) => el === second[i]);
+};
