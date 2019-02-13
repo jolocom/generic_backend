@@ -53,19 +53,10 @@ const consumeCredentialShareResponse = (redis: RedisApi) => async (
   req: RequestWithInteractionTokens,
   res: Response
 ) => {
-  const response = req.interactionToken.interactionToken as CredentialResponse;
-  const request = req.requestToken.interactionToken as CredentialRequest;
-  const { issuer, nonce } = req.requestToken;
+  const response = req.userResponseToken.interactionToken as CredentialResponse;
+  const { issuer, nonce } = req.serviceRequestToken;
 
   try {
-    if (!response.satisfiesRequest(request)) {
-      return res
-        .status(401)
-        .send(
-          "The supplied credentials do not match the types of the requested credentials"
-        );
-    }
-
     const passesValidation = response.suppliedCredentials.every(
       applyValidationFunction
     );

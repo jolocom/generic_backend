@@ -1,11 +1,10 @@
 import { JolocomLib } from "jolocom-lib";
 import { password, seed, serviceUrl } from "../config";
 import axios, {AxiosResponse} from 'axios'
-import { claimsMetadata } from "cred-types-jolocom-core";
+import { claimsMetadata } from "cred-types-jolocom-demo";
 import { Endpoints } from "./sockets";
 import { CredentialOffer } from "jolocom-lib/js/interactionTokens/credentialOffer";
 import { JSONWebToken } from "jolocom-lib/js/interactionTokens/JSONWebToken";
-import {Response} from 'express'
 
 const getIdentityWallet = async () => {
   const registry = JolocomLib.registries.jolocom.create();
@@ -48,11 +47,11 @@ export const testCredentialOffer = async () => {
 
   const cred = await identityWallet.create.signedCredential(
     {
-      subject: credentialRequest.issuer,
+      subject: identityWallet.did,
       claim: {
-        email: "test"
+        identifier: "0123451612"
       },
-      metadata: claimsMetadata.emailAddress
+      metadata: claimsMetadata.akaart
     },
     password
   );

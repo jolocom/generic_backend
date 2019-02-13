@@ -1,13 +1,13 @@
-import { Express, Request } from "express";
+import { Express } from "express";
 import { IdentityWallet } from "jolocom-lib/js/identityWallet/identityWallet";
 import { registration } from "./controllers/registration";
 import { issuance } from "./controllers/issuance";
 import { RedisApi } from "./types";
 import { Endpoints } from "./sockets";
 import {
-  matchAgainstRequest,
+  matchAgainstRequest, validateCredentialsAgainstRequest,
   validateSentInteractionToken
-} from "./middleware";
+} from './middleware'
 
 export const configureRoutes = (
   app: Express,
@@ -29,6 +29,7 @@ export const configureRoutes = (
     .post(
       validateSentInteractionToken,
       matchAgainstRequest(redis),
+      validateCredentialsAgainstRequest,
       issuance.consumeCredentialOfferResponse(identityWallet, redis)
     );
 };

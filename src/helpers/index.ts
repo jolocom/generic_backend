@@ -3,7 +3,7 @@ import { constraintFunctions } from "jolocom-lib/js/interactionTokens/credential
 import { IConstraint } from "jolocom-lib/js/interactionTokens/interactionTokens.types";
 import { ICredentialReqSection, RedisApi } from "../types";
 import { SignedCredential } from "jolocom-lib/js/credentials/signedCredential/signedCredential";
-import { credentialOffers, credentialRequirements } from "../../config";
+import { credentialRequirements } from "../../config";
 
 const { validate } = require("email-validator");
 
@@ -52,6 +52,7 @@ export const getDataFromUiForms = async (redis: RedisApi, key: string) => {
   return data;
 };
 
+// TODO test this better
 export const applyValidationFunction = (credential: SignedCredential) => {
   const { credentialValidator } = Object.values(credentialRequirements).find(
     ({ metadata }) => areArraysEqual(metadata.type, credential.type)
@@ -75,7 +76,7 @@ export const validateEmailCredential = (whitelistedValues: string[]) => ({
       : whitelistedValues.includes(claim.email)
   );
 
-const areArraysEqual = (first: string[], second: string[]) => {
+export const areArraysEqual = (first: string[], second: string[]) => {
   if (first.length !== second.length) {
     return false;
   }

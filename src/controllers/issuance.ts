@@ -43,7 +43,7 @@ const consumeCredentialOfferResponse = (
     return res.status(401).send("Requested credential type is not supported");
   }
 
-  const credentialOfferResponse = req.interactionToken;
+  const credentialOfferResponse = req.userResponseToken;
   const claim = await getDataFromUiForms(redis, credentialOfferResponse.nonce);
 
   const credential = await identityWallet.create.signedCredential(
