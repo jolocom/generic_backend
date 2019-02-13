@@ -5,7 +5,7 @@ import { issuance } from "./controllers/issuance";
 import { RedisApi } from "./types";
 import { Endpoints } from "./sockets";
 import {
-  matchAgainstRequest, validateCredentialsAgainstRequest,
+  matchAgainstRequest, validateAKaartNumber, validateCredentialsAgainstRequest,
   validateSentInteractionToken
 } from './middleware'
 
@@ -20,6 +20,8 @@ export const configureRoutes = (
     .post(
       validateSentInteractionToken,
       matchAgainstRequest(redis),
+      validateCredentialsAgainstRequest,
+      validateAKaartNumber,
       registration.consumeCredentialShareResponse(redis)
     );
 
@@ -29,7 +31,6 @@ export const configureRoutes = (
     .post(
       validateSentInteractionToken,
       matchAgainstRequest(redis),
-      validateCredentialsAgainstRequest,
       issuance.consumeCredentialOfferResponse(identityWallet, redis)
     );
 };

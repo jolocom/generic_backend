@@ -12,11 +12,8 @@ export interface RedisApi {
 export interface RequestWithInteractionTokens extends Request {
   userResponseToken: JSONWebToken<JWTEncodable>
   serviceRequestToken: JSONWebToken<JWTEncodable>
-  aKaart?: {
-    identifier: string
-    points?: number
-    success: boolean
-    error?: string
+  middlewareData?: {
+    [key: string]: any
   }
 }
 

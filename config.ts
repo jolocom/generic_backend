@@ -14,7 +14,7 @@ export const seed = Buffer.from(
 export const password = "correct horse battery staple";
 
 /* Where is your service deployed. E.g. https://demo-sso.jolocom.com, used by the frontend */
-export const serviceUrl = "http://localhost:9000";
+export const serviceUrl = "http://192.168.2.109:9000";
 export const frontendUrl = "http://localhost:3000"
 
 /* Credentials required during authentication */
@@ -28,7 +28,6 @@ export const credentialRequirements = {
   },
   'a-kaart': {
     metadata: demoClaimsMetadata.akaart,
-    issuer: "did:jolo:b2d5d8d6cc140033419b54a237a5db51710439f9f462d1fc98f698eca7ce9777" // Can be used to whitelist the issuer of requested credential. If empty, or omitted, all issuers are accepted
   },
   'driver-license': {
     metadata: demoClaimsMetadata.demoDriversLicence,

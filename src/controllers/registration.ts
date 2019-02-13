@@ -16,7 +16,6 @@ import {
   setStatusPending
 } from "../helpers/";
 import { CredentialResponse } from "jolocom-lib/js/interactionTokens/credentialResponse";
-import { CredentialRequest } from "jolocom-lib/js/interactionTokens/credentialRequest";
 import { Endpoints } from "../sockets";
 
 const generateCredentialShareRequest = (
@@ -46,6 +45,7 @@ const generateCredentialShareRequest = (
 
   const token = credentialRequest.encode();
   await setStatusPending(redis, credentialRequest.nonce, { request: token });
+  console.log(token)
   res.send({ token, identifier: credentialRequest.nonce });
 };
 
@@ -69,6 +69,7 @@ const consumeCredentialShareResponse = (redis: RedisApi) => async (
 
     const data = {
       ...extractDataFromClaims(response),
+      ...req.middlewareData,
       did: issuer
     };
 

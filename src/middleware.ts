@@ -17,13 +17,13 @@ export const validateSentInteractionToken = async (
     );
 
     if (!JolocomLib.util.validateDigestable(interactionToken)) {
-      return res.status(401).send("Invalid signature on interaction token");
+      res.status(401).send("Invalid signature on interaction token");
     }
 
     req.userResponseToken = interactionToken;
-    return next();
+    next();
   } catch (err) {
-    return res
+    res
       .status(401)
       .send(`Could not parse interaction token - ${err.message}`);
   }
@@ -37,7 +37,7 @@ export const matchAgainstRequest = (redis: RedisApi) => async (
   const sentRequestJWT = await redis.getAsync(req.userResponseToken.nonce);
 
   if (!sentRequestJWT) {
-    return res.status(401).send("No request token found");
+    res.status(401).send("No request token found");
   }
 
   const { request: requestToken } = JSON.parse(sentRequestJWT);
@@ -45,27 +45,27 @@ export const matchAgainstRequest = (redis: RedisApi) => async (
   try {
     req.serviceRequestToken = JolocomLib.parse.interactionToken.fromJWT(requestToken);
   } catch (err) {
-    return res
+    res
       .status(401)
       .send(`Failed to decode request token - ${err.message}`);
   }
 
-  return next();
+  next();
 };
 
-export const validateCredentialsAgainstRequest = async(req: RequestWithInteractionTokens, res: Response, next: NextFunction) => {
+export const validateCredentialsAgainstRequest = async (req: RequestWithInteractionTokens, res: Response, next: NextFunction) => {
   const response = req.userResponseToken.interactionToken as CredentialResponse;
   const request = req.serviceRequestToken.interactionToken as CredentialRequest;
 
-  if (response.satisfiesRequest(request)) {
-    return res
+  if (!response.satisfiesRequest(request)) {
+    res
     .status(401)
     .send(
       "The supplied credentials do not match the types of the requested credentials"
     );
   }
 
- return next()
+ next()
 }
 
 export const validateAKaartNumber = async (req: RequestWithInteractionTokens, res: Response, next: NextFunction) => {
@@ -73,7 +73,7 @@ export const validateAKaartNumber = async (req: RequestWithInteractionTokens, re
   const aKaartCredential = suppliedCredentials.find(credential => areArraysEqual(credential.type, claimsMetadata.akaart.type))
 
   if(!aKaartCredential) {
-    return res.status(401).send('No A-Kaart credential was found')
+    res.status(401).send('No A-Kaart credential was found')
   }
 
   const { identifier: aKaartIdentifier } = aKaartCredential.claim
@@ -85,17 +85,17 @@ export const validateAKaartNumber = async (req: RequestWithInteractionTokens, re
 
   try {
     const { pointsBalance } = { pointsBalance: 400 } // const points = (await axios(endpoint/cards/identifier)).data
-    req.aKaart = {
+    req.middlewareData = {
       ...aKaartRecord,
       points: pointsBalance,
     }
-    return next()
+    next()
   } catch(err) {
-    req.aKaart = {
+    req.middlewareData = {
       ...aKaartRecord,
       success: false,
       error: err.message
     }
-    return res.status(401).send('Could not validate A-Kaart account')
+    res.status(401).send('Could not validate A-Kaart account')
   }
 }
