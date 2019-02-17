@@ -5,9 +5,10 @@ import { issuance } from "./controllers/issuance";
 import { RedisApi } from "./types";
 import { Endpoints } from "./sockets";
 import {
-  matchAgainstRequest, validateAKaartNumber, validateCredentialsAgainstRequest,
+  matchAgainstRequest,
+  validateCredentialsAgainstRequest,
   validateSentInteractionToken
-} from './middleware'
+} from "./middleware";
 
 export const configureRoutes = (
   app: Express,
@@ -21,7 +22,6 @@ export const configureRoutes = (
       validateSentInteractionToken,
       matchAgainstRequest(redis),
       validateCredentialsAgainstRequest,
-      validateAKaartNumber,
       registration.consumeCredentialShareResponse(redis)
     );
 
