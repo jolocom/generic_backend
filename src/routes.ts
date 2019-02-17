@@ -9,6 +9,7 @@ import {
   validateCredentialsAgainstRequest,
   validateSentInteractionToken
 } from "./middleware";
+import { addCustomAuthnMiddleware } from './customHandlers/customMiddleware';
 
 export const configureDefaultRoutes = (
   app: Express,
@@ -22,6 +23,7 @@ export const configureDefaultRoutes = (
       validateSentInteractionToken,
       matchAgainstRequest(redis),
       validateCredentialsAgainstRequest,
+      addCustomAuthnMiddleware(redis),
       registration.consumeCredentialShareResponse(redis)
     );
 
@@ -34,10 +36,3 @@ export const configureDefaultRoutes = (
       issuance.consumeCredentialOfferResponse(identityWallet, redis)
     );
 };
-
-export const configureCustomRoutes = (
-    app: Express,
-    redis: RedisApi
-) => {
-
-}
