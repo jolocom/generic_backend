@@ -10,7 +10,7 @@ import {
   validateSentInteractionToken
 } from "./middleware";
 
-export const configureRoutes = (
+export const configureDefaultRoutes = (
   app: Express,
   redis: RedisApi,
   identityWallet: IdentityWallet
@@ -34,3 +34,10 @@ export const configureRoutes = (
       issuance.consumeCredentialOfferResponse(identityWallet, redis)
     );
 };
+
+export const configureCustomRoutes = (
+    app: Express,
+    redis: RedisApi
+) => {
+
+}

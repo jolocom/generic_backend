@@ -1,6 +1,6 @@
 import { JolocomLib } from "jolocom-lib";
 import * as http from "http";
-import { configureRoutes } from "./routes";
+import { configureDefaultRoutes, configureCustomRoutes } from "./routes";
 import { getConfiguredApp } from "./app";
 import { initializeRedisClient } from "./redis";
 import { password, seed } from "../config";
@@ -21,7 +21,8 @@ registry
     encryptionPass: password
   })
   .then(identityWallet => {
-    configureRoutes(app, redis, identityWallet);
+    configureDefaultRoutes(app, redis, identityWallet);
+    configureCustomRoutes(app, redis);
     configureSockets(server, identityWallet, redis, dbWatcher);
     server.listen(9000);
   });
