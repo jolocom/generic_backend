@@ -41,15 +41,15 @@ export const setDataFromUiForms = (
   redis: RedisApi,
   key: string,
   data: string
-) => redis.setAsync(`${key}_formData`, data);
+) => redis.setAsync(`${key}_formData`, data || '{}');
 
 export const getDataFromUiForms = async (redis: RedisApi, key: string) => {
   const derivedKey = `${key}_formData`;
-  const data = JSON.parse(await redis.getAsync(derivedKey)) || {};
+  const data = await redis.getAsync(derivedKey)
 
   await redis.delAsync(derivedKey);
 
-  return data;
+  return data ? JSON.parse(data): {};
 };
 
 // TODO test this better
