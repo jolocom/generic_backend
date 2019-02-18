@@ -9,7 +9,7 @@
     "axios": "^0.18.0",
     "body-parser": "^1.18.3",
     "cors": "^2.8.4",
-    "cred-types-jolocom-demo": "^0.1.0",
+    "cred-types-jolocom-demo": "^0.1.1",
     "email-validator": "^2.0.4",
     "express": "^4.16.3",
     "jolocom-lib": "^2.2.9",

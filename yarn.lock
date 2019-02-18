@@ -554,10 +554,6 @@
   version "15.5.7"
   resolved "https://registry.yarnpkg.com/@types/prop-types/-/prop-types-15.5.7.tgz#c6f1e0d0109ff358b132d98b7b4025c7a7b707c5"
 
-"@types/ramda@^0.25.48":
-  version "0.25.48"
-  resolved "https://registry.yarnpkg.com/@types/ramda/-/ramda-0.25.48.tgz#775fc56ae469394146edfff5996b201851bc39b6"
-
 "@types/range-parser@*":
   version "1.2.3"
   resolved "https://registry.yarnpkg.com/@types/range-parser/-/range-parser-1.2.3.tgz#7ee330ba7caafb98090bece86a5ee44115904c2c"
@@ -1378,9 +1374,9 @@ cred-types-jolocom-core@^0.0.9:
   version "0.0.9"
   resolved "https://registry.yarnpkg.com/cred-types-jolocom-core/-/cred-types-jolocom-core-0.0.9.tgz#6d3a0a0b59838ec68f6e7fdf0ff234b349a1f42a"
 
-cred-types-jolocom-demo@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/cred-types-jolocom-demo/-/cred-types-jolocom-demo-0.1.0.tgz#774b5aa16825cd5787162f0289dc6741d4061d88"
+cred-types-jolocom-demo@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/cred-types-jolocom-demo/-/cred-types-jolocom-demo-0.1.1.tgz#4c8351b3df75f4d827bdaa7b4bc39b75f0115359"
 
 cross-spawn@^6.0.0:
   version "6.0.5"
@@ -3579,10 +3575,6 @@ query-string@^5.0.1:
     decode-uri-component "^0.2.0"
     object-assign "^4.1.0"
     strict-uri-encode "^1.0.0"
-
-ramda@^0.26.1:
-  version "0.26.1"
-  resolved "https://registry.yarnpkg.com/ramda/-/ramda-0.26.1.tgz#8d41351eb8111c55353617fc3bbffad8e4d35d06"
 
 randombytes@^2.0.0, randombytes@^2.0.1, randombytes@^2.0.5, randombytes@^2.0.6:
   version "2.0.6"
