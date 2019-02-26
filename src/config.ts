@@ -15,12 +15,11 @@ export const password = 'correct horse battery staple'
 
 /* Where is your service deployed. E.g. https://demo-sso.jolocom.com, used by the frontend */
 export const serviceUrl = 'http://192.168.2.109:9000'
-export const frontendUrl = 'http://192.168.2.109:3000'
 
 /* Credentials required during authentication */
-
 export const currentCredentialRequirements = ['a-kaart']
 
+/* Credentials offered to users */
 export const credentialRequirements = {
   'a-kaart': {
     metadata: demoClaimsMetadata.akaart

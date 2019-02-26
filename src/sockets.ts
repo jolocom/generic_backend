@@ -1,6 +1,6 @@
 import { SSO } from 'jolocom-lib/js/sso/sso'
 import * as io from 'socket.io'
-import { frontendUrl, serviceUrl } from './config'
+import { serviceUrl } from './config'
 import * as http from 'http'
 import { DbWatcher } from './dbWatcher'
 import { RedisApi } from './types'
@@ -24,8 +24,6 @@ export const configureSockets = (
   dbWatcher: DbWatcher
 ) => {
   const baseSocket = io(server)
-  baseSocket.origins([frontendUrl])
-
   const authnSocket = baseSocket.of(Endpoints.authn)
   const receiveCredSocket = baseSocket.of(Endpoints.receive)
 
