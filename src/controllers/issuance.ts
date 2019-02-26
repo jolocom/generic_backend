@@ -1,20 +1,20 @@
-import {credentialOffer, password, serviceUrl} from '../../config'
-import {Request, Response} from 'express'
-import {IdentityWallet} from 'jolocom-lib/js/identityWallet/identityWallet'
-import {RedisApi} from '../types'
-import {JolocomLib} from 'jolocom-lib'
-import {extractDataFromClaims} from '../helpers'
+import { credentialOffers, password, serviceUrl } from '../config'
+import { Request, Response } from 'express'
+import { IdentityWallet } from 'jolocom-lib/js/identityWallet/identityWallet'
+import { RedisApi, RequestWithInteractionTokens } from '../types'
+import { keyIdToDid } from 'jolocom-lib/js/utils/helper'
+import { getDataFromUiForms, setStatusDone, setStatusPending } from '../helpers'
 
-const generateCredentialOffer = async (
+const generateCredentialOffer = (
   identityWallet: IdentityWallet,
-  redis: RedisApi,
-  req: Request,
-  res: Response
-) => {
+  redis: RedisApi
+) => async (req: Request, res: Response) => {
+  const { credentialType } = req.params
+
   try {
     const credOffer = await identityWallet.create.interactionTokens.request.offer(
       {
-        callbackURL: `${serviceUrl}/receive/${req.params.type}`,
+        callbackURL: `${serviceUrl}/receive/${credentialType}`,
         requestedInput: {},
         instant: true
       },
@@ -22,53 +22,45 @@ const generateCredentialOffer = async (
     )
 
     const token = credOffer.encode()
-    await redis.setAsync(credOffer.nonce, token)
-    return res.status(200).send({token})
+    await setStatusPending(redis, credOffer.nonce, { request: token })
+    return res.send({ token, identifier: credOffer.nonce })
   } catch (err) {
-    return res.status(500).send({error: err.message})
+    return res.status(500).send({ error: err.message })
   }
 }
 
-const consumeCredentialOfferResponse = async (
+const consumeCredentialOfferResponse = (
   identityWallet: IdentityWallet,
-  redis: RedisApi,
-  req: Request,
-  res: Response
-) => {
-  const { type, token } = req.body
-  try {
-    // const credentialOfferResponse = await JolocomLib.parse.interactionToken.fromJWT(
-    //   token
-    // );
-    //
-    // // const providedData = credentialOfferResponse.
-    // // const credentialOfferJWT = await redis.getAsync(credentialOfferResponse.nonce);
-    //
-    // if (!credentialOfferJWT) {
-    //   return res.status(401).send("Corresponding request token not found");
-    // }
-    //
-    // const credentialOffer = await JolocomLib.parse.interactionToken.fromJWT(
-    //   credentialOfferJWT
-    // );
-    //
-    // if (!(await JolocomLib.util.validateDigestable(credentialOffer))) {
-    //   return res.status(401).send("Invalid signature on interaction token");
-    // }
-    //
-    // // await redis.setAsync(
-    // //   credentialResponse.nonce,
-    // //   JSON.stringify({ status: "success", data })
-    // // );
-    return res.status(200).send();
-  } catch (err) {
-    return res.status(401).send(err.message);
+  redis: RedisApi
+) => async (req: RequestWithInteractionTokens, res: Response) => {
+  const { credentialType } = req.params
+
+  if (!credentialType || !credentialOffers[credentialType]) {
+    return res.status(401).send('Requested credential type is not supported')
   }
-  const credential = await identityWallet.create.signedCredential({
-    metadata: credentialOffer[type],
-    claim: {},
-    subject: ''
-  }, password)
+
+  const credentialOfferResponse = req.userResponseToken
+  const claim = await getDataFromUiForms(redis, credentialOfferResponse.nonce)
+
+  const credential = await identityWallet.create.signedCredential(
+    {
+      metadata: credentialOffers[credentialType],
+      claim,
+      subject: keyIdToDid(credentialOfferResponse.issuer)
+    },
+    password
+  )
+
+  const credentialReceive = await identityWallet.create.interactionTokens.response.issue(
+    {
+      signedCredentials: [credential.toJSON()]
+    },
+    password,
+    credentialOfferResponse
+  )
+
+  await setStatusDone(redis, credentialOfferResponse.nonce)
+  return res.json({ token: credentialReceive.encode() })
 }
 
 export const issuance = {

@@ -1,42 +1,78 @@
-import { JolocomLib } from "jolocom-lib";
-import { password, seed, serviceUrl } from "../config";
-import axios from "axios";
-import {claimsMetadata} from 'cred-types-jolocom-core'
+import { JolocomLib } from 'jolocom-lib'
+import { password, seed, serviceUrl } from './config'
+import axios, { AxiosResponse } from 'axios'
+import { claimsMetadata } from 'cred-types-jolocom-demo'
+import { Endpoints } from './sockets'
+import { CredentialOffer } from 'jolocom-lib/js/interactionTokens/credentialOffer'
+import { JSONWebToken } from 'jolocom-lib/js/interactionTokens/JSONWebToken'
 
-export const generateValidCredentialResponse = async () => {
-  const registry = JolocomLib.registries.jolocom.create();
-  const vaultedKeyProvider = new JolocomLib.KeyProvider(seed, password);
+const getIdentityWallet = async () => {
+  const registry = JolocomLib.registries.jolocom.create()
+  const vaultedKeyProvider = new JolocomLib.KeyProvider(seed, password)
 
-  const { token } = (await axios.get(`${serviceUrl}/authenticate`)).data;
-
-  const iw = await registry.authenticate(vaultedKeyProvider, {
+  return registry.authenticate(vaultedKeyProvider, {
     derivationPath: JolocomLib.KeyTypes.jolocomIdentityKey,
     encryptionPass: password
-  });
+  })
+}
 
-  const credentialRequest = JolocomLib.parse.interactionToken.fromJWT(token);
-  const cred = await iw.create.signedCredential({
-    subject: credentialRequest.issuer,
-    claim: {
-      email: 'temst'
+export const testCredentialReceive = async () => {
+  const identityWallet = await getIdentityWallet()
+
+  const { token } = (await axios.get(
+    `${serviceUrl}${Endpoints.receive}id-card`
+  )).data
+  const credentialOffer: JSONWebToken<
+    CredentialOffer
+  > = JolocomLib.parse.interactionToken.fromJWT(token)
+
+  const offerResponse = await identityWallet.create.interactionTokens.response.offer(
+    credentialOffer.interactionToken.toJSON(),
+    password,
+    JolocomLib.parse.interactionToken.fromJWT(token)
+  )
+
+  return axios
+    .post(`${serviceUrl}${Endpoints.receive}id-card`, {
+      token: offerResponse.encode()
+    })
+    .catch(err => console.log(err))
+}
+
+export const testCredentialOffer = async () => {
+  const identityWallet = await getIdentityWallet()
+
+  const { token } = (await axios.get(`${serviceUrl}${Endpoints.authn}`)).data
+  const credentialRequest = JolocomLib.parse.interactionToken.fromJWT(token)
+
+  const cred = await identityWallet.create.signedCredential(
+    {
+      subject: identityWallet.did,
+      claim: {
+        identifier: '0123451612'
+      },
+      metadata: claimsMetadata.akaart
     },
-    metadata: claimsMetadata.emailAddress
-  }, password)
+    password
+  )
 
-  const credentialResponse = await iw.create.interactionTokens.response.share(
+  const credentialResponse = await identityWallet.create.interactionTokens.response.share(
     {
       suppliedCredentials: [cred.toJSON()],
       callbackURL: credentialRequest.interactionToken.callbackURL
     },
     password,
     credentialRequest
-  );
+  )
 
-  return axios.post(`${serviceUrl}/authenticate`, {
-    token: credentialResponse.encode()
-  });
-};
+  return axios
+    .post(`${serviceUrl}/authenticate`, {
+      token: credentialResponse.encode()
+    })
+    .catch(err => console.log(err))
+}
 
-generateValidCredentialResponse()
-  .then(res => console.log(res))
-  .catch(err => console.log(err));
+// testCredentialReceive().then((res: AxiosResponse) => console.log(res.status))
+testCredentialOffer()
+  .then((res: AxiosResponse) => console.log(res.status))
+  .catch(err => console.log(err))
