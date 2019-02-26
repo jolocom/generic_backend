@@ -1,15 +1,15 @@
-import { Express } from "express";
-import { IdentityWallet } from "jolocom-lib/js/identityWallet/identityWallet";
-import { registration } from "./controllers/registration";
-import { issuance } from "./controllers/issuance";
-import { RedisApi } from "./types";
-import { Endpoints } from "./sockets";
+import { Express } from 'express'
+import { IdentityWallet } from 'jolocom-lib/js/identityWallet/identityWallet'
+import { registration } from './controllers/registration'
+import { issuance } from './controllers/issuance'
+import { RedisApi } from './types'
+import { Endpoints } from './sockets'
 import {
   matchAgainstRequest,
   validateCredentialsAgainstRequest,
   validateSentInteractionToken
-} from "./middleware";
-import { addCustomAuthnMiddleware } from './customHandlers/customMiddleware';
+} from './middleware'
+import { addCustomAuthnMiddleware } from './customHandlers/customMiddleware'
 
 export const configureDefaultRoutes = (
   app: Express,
@@ -25,7 +25,7 @@ export const configureDefaultRoutes = (
       validateCredentialsAgainstRequest,
       addCustomAuthnMiddleware(redis),
       registration.consumeCredentialShareResponse(redis)
-    );
+    )
 
   app
     .route(`${Endpoints.receive}:credentialType`)
@@ -34,5 +34,5 @@ export const configureDefaultRoutes = (
       validateSentInteractionToken,
       matchAgainstRequest(redis),
       issuance.consumeCredentialOfferResponse(identityWallet, redis)
-    );
-};
+    )
+}

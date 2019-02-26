@@ -15,7 +15,8 @@ export const initializeRedisClient = () => {
   // TODO explain / TEST
   return {
     getAsync: promisify(client.get).bind(client),
-    setAsync: (key: string, value: string) => promisify(client.set).bind(client)(key, value, 'EX', 60 * 30),
+    setAsync: (key: string, value: string) =>
+      promisify(client.set).bind(client)(key, value, 'EX', 60 * 30),
     delAsync: promisify(client.del).bind(client)
   }
 }
