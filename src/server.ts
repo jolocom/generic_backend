@@ -3,7 +3,7 @@ import * as http from 'http'
 import { configureDefaultRoutes } from './routes'
 import { getConfiguredApp } from './app'
 import { initializeRedisClient } from './redis'
-import { password, seed } from '../config'
+import { password, seed } from './config'
 import { configureSockets } from './sockets'
 import { DbWatcher } from './dbWatcher'
 import { configureCustomRoutes } from './customHandlers/customRoutes'
@@ -24,6 +24,6 @@ registry
   .then(identityWallet => {
     configureDefaultRoutes(app, redis, identityWallet)
     configureCustomRoutes(app, redis)
-    configureSockets(server, identityWallet, redis, dbWatcher)
+    configureSockets(server, redis, dbWatcher)
     server.listen(9000)
   })

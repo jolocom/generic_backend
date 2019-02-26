@@ -1,9 +1,8 @@
 import { SSO } from 'jolocom-lib/js/sso/sso'
 import * as io from 'socket.io'
-import { frontendUrl, serviceUrl } from '../config'
+import { frontendUrl, serviceUrl } from './config'
 import * as http from 'http'
 import { DbWatcher } from './dbWatcher'
-import { IdentityWallet } from 'jolocom-lib/js/identityWallet/identityWallet'
 import { RedisApi } from './types'
 import axios from 'axios'
 import { Socket } from 'socket.io'
@@ -21,7 +20,6 @@ export enum Endpoints {
 
 export const configureSockets = (
   server: http.Server,
-  identityWallet: IdentityWallet,
   redis: RedisApi,
   dbWatcher: DbWatcher
 ) => {

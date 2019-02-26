@@ -1,5 +1,5 @@
 import { JolocomLib } from 'jolocom-lib'
-import { password, seed, serviceUrl } from '../config'
+import { password, seed, serviceUrl } from './config'
 import axios, { AxiosResponse } from 'axios'
 import { claimsMetadata } from 'cred-types-jolocom-demo'
 import { Endpoints } from './sockets'

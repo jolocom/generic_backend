@@ -6,7 +6,7 @@
     "build": "tsc -p ./tsconfig.json",
     "clean": "rm -rf ./build",
     "start": "yarn run redis:start; yarn run server; yarn run redis:stop",
-    "server": "node ./build/src/server.js",
+    "server": "node ./build/server.js",
     "redis:start": "redis-server &",
     "redis:stop": "redis-cli SHUTDOWN"
   },

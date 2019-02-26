@@ -1,5 +1,4 @@
-import { RedisApi } from 'src/types';
-import { Express } from 'express';
+import { RedisApi } from 'src/types'
+import { Express } from 'express'
 
-export const configureCustomRoutes = (app: Express, redis: RedisApi) => {
-}
+export const configureCustomRoutes = (app: Express, redis: RedisApi) => {}
