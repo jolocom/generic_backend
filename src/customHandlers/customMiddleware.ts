@@ -51,7 +51,7 @@ export const addCustomAuthnMiddleware = (redis: RedisApi) => async (
   }
 
   try {
-    const cheques = await getUserCheques(aKaartIdentifier)
+    const cheques = await getUserCheques(aKaartIdentifier as string)
 
     if (cheques.length) {
       req.middlewareData = {
