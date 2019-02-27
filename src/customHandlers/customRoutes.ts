@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { RedisApi } from 'src/types'
+import { RedisApi } from '../types'
 import { Response, Request, Express } from 'express'
 import {
   debugConfig,

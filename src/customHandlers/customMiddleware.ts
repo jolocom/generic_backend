@@ -1,5 +1,5 @@
 import axios, { AxiosPromise } from 'axios'
-import { RequestWithInteractionTokens, RedisApi } from 'src/types'
+import { RequestWithInteractionTokens, RedisApi } from '../types'
 import { Response, NextFunction } from 'express'
 import { CredentialResponse } from 'jolocom-lib/js/interactionTokens/credentialResponse'
 import { claimsMetadata } from 'cred-types-jolocom-demo'
@@ -10,7 +10,7 @@ import {
   debugConfig,
   gatewayUrl
 } from './utils'
-import { areArraysEqual } from 'src/helpers/validators'
+import { areArraysEqual } from '../helpers/validators'
 
 const getUserDataALoyaltyService = (
   accessTokens: AccessTokens,
