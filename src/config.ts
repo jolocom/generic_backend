@@ -28,3 +28,13 @@ export const credentialRequirements = {
 
 /* Credentials offered by the service. Documentation on how to include custom credentials coming soon */
 export const credentialOffers = {} as { [key: string]: BaseMetadata }
+
+export const bookList = [
+    9781623170745,
+    9780990489177,
+    9783950313949,
+    9783039092819,
+    9781937146580,
+    9781523930470,
+    9781719127141
+];
