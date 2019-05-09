@@ -1,17 +1,20 @@
 import { BaseMetadata } from 'cred-types-jolocom-core'
 import { claimsMetadata as demoClaimsMetadata } from 'cred-types-jolocom-demo'
 import { ICredentialReqSection } from './types'
+import { config } from 'dotenv';
+
+config();
 
 /**
  * The seed to instantiate a vaulted key provider and password for seed encryption / decryption
  * The need to persist the seed in clear text will be addressed in the next minor release
  */
 export const seed = Buffer.from(
-  'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+  process.env.SEED,
   'hex'
 )
 
-export const password = 'correct horse battery staple'
+export const password = process.env.PASSWORD;
 
 /* Where is your service deployed. E.g. https://demo-sso.jolocom.com, used by the frontend */
 export const serviceUrl = 'http://192.168.2.109:9000'

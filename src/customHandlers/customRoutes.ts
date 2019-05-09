@@ -12,6 +12,11 @@ export const configureCustomRoutes = (app: Express, redis: RedisApi) => {
     app
       .route('/book/:isbn')
       .get(library.getBookDetails(redis))
+
+    app
+      .route('/rent/:isbn')
+      .get() // get cred/auth request
+      .post() // post response, confirm rental
   });
 }
 
