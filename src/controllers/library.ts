@@ -1,9 +1,10 @@
-import { Response } from 'express'
+import { Response, Request } from 'express'
 import { RedisApi, RequestWithInteractionTokens } from '../types'
 import * as ISBN from 'node-isbn';
 import {
   bookList
 } from '../config'
+import { IdentityWallet } from 'jolocom-lib/js/identityWallet/identityWallet';
 
 const retrieveBook = async (isbn: number, redis: RedisApi) => JSON.parse(await redis.getAsync(isbn.toString()));
 
@@ -25,6 +26,25 @@ const getBookDetails = (
               .map(async (isbn) => await retrieveBook(isbn, redis)))
     .then(books => res.send(books[0]))
     .catch(err => res.status(404).send(err))
+}
+
+const getRentReq = (
+  redis: RedisApi,
+  id: IdentityWallet
+) => async (
+  req: Request,
+  res: Response
+) => {
+
+}
+
+const rentBook = (
+  redis: RedisApi,
+  id: IdentityWallet
+) => async (
+  req: RequestWithInteractionTokens,
+  res: Response
+) => {
 }
 
 const populateDB = (

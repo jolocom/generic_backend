@@ -20,11 +20,11 @@ export const password = process.env.PASSWORD;
 export const serviceUrl = 'http://192.168.2.109:9000'
 
 /* Credentials required during authentication */
-export const currentCredentialRequirements = ['a-kaart']
+export const currentCredentialRequirements = ['jolocom']
 
 /* Credentials offered to users */
 export const credentialRequirements = {
-  'a-kaart': {
+  'jolocom': {
     metadata: demoClaimsMetadata.akaart
   }
 } as { [key: string]: ICredentialReqSection }
