@@ -1,9 +1,8 @@
 import { Response, Request } from 'express'
-import { RedisApi, RequestWithInteractionTokens } from '../types'
+import { RedisApi } from '../types'
 import * as ISBN from 'node-isbn';
 import {
     bookList,
-    password
 } from '../config'
 import { IdentityWallet } from 'jolocom-lib/js/identityWallet/identityWallet';
 
@@ -30,24 +29,32 @@ const getBookDetails = (
             .then(book => res.send(book))
             .catch(err => res.status(404).send(err))
 
-const getRentReq = (
-    redis: RedisApi,
-    id: IdentityWallet
-) => async (
-    req: Request,
-    res: Response
-) => {
-
-    }
-
 const rentBook = (
-    redis: RedisApi,
-    id: IdentityWallet
+    redis: RedisApi
 ) => async (
-    req: RequestWithInteractionTokens,
-    res: Response
-) => {
+    bookDid: string,
+    userDid: string,
+): Promise<boolean> => {
+    try {
+        // is book rented?
+        const book = await retrieveBook(bookDid, redis)
+        if (!book.available) {
+            return false
+        }
+
+        // set book unavailable
+        book.available = false
+
+        // add book to user table
+        const userBooks = JSON.parse(await redis.getAsync(userDid)) as string[];
+        userBooks.push(bookDid);
+        await redis.setAsync(userDid,JSON.stringify(userBooks))
+        await redis.setAsync(bookDid, JSON.stringify(book))
+        return true
+    } catch (err) {
+        return false
     }
+}
 
 const populateDB = (
     redis: RedisApi
@@ -76,7 +83,6 @@ const populateDB = (
 export const library = {
     getBooks,
     getBookDetails,
-    getRentReq,
     rentBook,
     populateDB
 }

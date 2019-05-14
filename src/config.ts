@@ -1,7 +1,7 @@
 import { BaseMetadata } from 'cred-types-jolocom-core'
 import { claimsMetadata as demoClaimsMetadata } from 'cred-types-jolocom-demo'
 import { ICredentialReqSection } from './types'
-import { config } from 'dotenv';
+import { config } from 'dotenv'
 
 config()
 
@@ -10,8 +10,8 @@ config()
  * The need to persist the seed in clear text will be addressed in the next minor release
  */
 export const seed = Buffer.from(
-  process.env.SEED,
-  'hex'
+    process.env.SEED,
+    'hex'
 )
 
 export const password = process.env.PASSWORD
@@ -26,9 +26,9 @@ export const currentCredentialRequirements = ['jolocom']
 
 /* Credentials offered to users */
 export const credentialRequirements = {
-  'jolocom': {
-    metadata: demoClaimsMetadata.akaart
-  }
+    'jolocom': {
+        metadata: demoClaimsMetadata.akaart
+    }
 } as { [key: string]: ICredentialReqSection }
 
 /* Credentials offered by the service. Documentation on how to include custom credentials coming soon */
