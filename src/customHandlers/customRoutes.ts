@@ -1,22 +1,27 @@
 import { RedisApi } from 'src/types'
 import { Express } from 'express'
-import { library } from '../controllers/library';
-import { bookList } from '../config';
+import { library } from '../controllers/library'
+import {
+    bookList,
+    password
+} from '../config'
+import { setupLibrary } from '../helpers/books';
+import { IdentityWallet } from 'jolocom-lib/js/identityWallet/identityWallet';
 
-export const configureCustomRoutes = (app: Express, redis: RedisApi) => {
-  library.populateDB(redis)(bookList).then(_ => {
-    app
-      .route('/books/')
-      .get(library.getBooks(redis))
+export const configureCustomRoutes = (app: Express, redis: RedisApi, identityWallet: IdentityWallet) =>
+    setupLibrary(identityWallet, password, bookList)
+        .then(almostBooks => Promise.all(almostBooks)
+            .then(books => library.populateDB(redis)(books)
+                .then(_ => {
+                    app
+                        .route('/books/')
+                        .get(library.getBooks(redis))
 
-    app
-      .route('/book/:isbn')
-      .get(library.getBookDetails(redis))
+                    app
+                        .route('/book/:did')
+                        .get(library.getBookDetails(redis))
+                })
+            )
+        )
 
-    app
-      .route('/rent/:isbn')
-      .get() // get cred/auth request
-      .post() // post response, confirm rental
-  });
-}
 

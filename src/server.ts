@@ -3,7 +3,7 @@ import * as http from 'http'
 import { configureDefaultRoutes } from './routes'
 import { getConfiguredApp } from './app'
 import { initializeRedisClient } from './redis'
-import { password, seed } from './config'
+import { password, seed, port } from './config'
 import { configureSockets } from './sockets'
 import { DbWatcher } from './dbWatcher'
 import { configureCustomRoutes } from './customHandlers/customRoutes'
@@ -17,13 +17,13 @@ const vaultedKeyProvider = new JolocomLib.KeyProvider(seed, password)
 const dbWatcher = new DbWatcher(redis.getAsync)
 
 registry
-  .authenticate(vaultedKeyProvider, {
-    derivationPath: JolocomLib.KeyTypes.jolocomIdentityKey,
-    encryptionPass: password
-  })
-  .then(identityWallet => {
-    configureDefaultRoutes(app, redis, identityWallet)
-    configureCustomRoutes(app, redis)
-    configureSockets(server, redis, dbWatcher)
-    server.listen(9000)
-  })
+    .authenticate(vaultedKeyProvider, {
+        derivationPath: JolocomLib.KeyTypes.jolocomIdentityKey,
+        encryptionPass: password
+    })
+    .then(identityWallet => {
+        configureDefaultRoutes(app, redis, identityWallet)
+        configureCustomRoutes(app, redis, identityWallet)
+        configureSockets(server, redis, dbWatcher)
+        server.listen(port || 9000)
+    })

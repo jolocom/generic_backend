@@ -3,7 +3,7 @@ import { claimsMetadata as demoClaimsMetadata } from 'cred-types-jolocom-demo'
 import { ICredentialReqSection } from './types'
 import { config } from 'dotenv';
 
-config();
+config()
 
 /**
  * The seed to instantiate a vaulted key provider and password for seed encryption / decryption
@@ -14,7 +14,9 @@ export const seed = Buffer.from(
   'hex'
 )
 
-export const password = process.env.PASSWORD;
+export const password = process.env.PASSWORD
+
+export const port = process.env.PORT
 
 /* Where is your service deployed. E.g. https://demo-sso.jolocom.com, used by the frontend */
 export const serviceUrl = 'http://192.168.2.109:9000'
@@ -40,4 +42,4 @@ export const bookList = [
     9781937146580,
     9781523930470,
     9781719127141
-];
+]

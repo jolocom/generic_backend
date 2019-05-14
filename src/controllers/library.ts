@@ -2,69 +2,81 @@ import { Response, Request } from 'express'
 import { RedisApi, RequestWithInteractionTokens } from '../types'
 import * as ISBN from 'node-isbn';
 import {
-  bookList
+    bookList,
+    password
 } from '../config'
 import { IdentityWallet } from 'jolocom-lib/js/identityWallet/identityWallet';
 
-const retrieveBook = async (isbn: number, redis: RedisApi) => JSON.parse(await redis.getAsync(isbn.toString()));
+const retrieveBook = async (did: string, redis: RedisApi) => JSON.parse(await redis.getAsync(did));
+const retrieveDID = async (isbn: number, redis: RedisApi) => await redis.getAsync(isbn.toString());
 
 const getBooks = (
-  redis: RedisApi
-) => async (req: RequestWithInteractionTokens, res: Response) => {
-  Promise.all(bookList.map(async (isbn) => await retrieveBook(isbn, redis)))
-    .then(books => res.send(books))
-    .catch(err => res.status(500).send(err))
-}
+    redis: RedisApi
+) => async (
+    req: Request,
+    res: Response
+) =>
+        Promise.all(bookList.map(async (isbn) => await retrieveBook(await retrieveDID(isbn, redis), redis)))
+            .then(books => res.send(books))
+            .catch(err => res.status(500).send(err))
 
 const getBookDetails = (
-  redis: RedisApi
+    redis: RedisApi
 ) => async (
-  req: RequestWithInteractionTokens,
-  res: Response
-) => {
-  Promise.all(bookList.filter(isbn => isbn == req.params.isbn)
-              .map(async (isbn) => await retrieveBook(isbn, redis)))
-    .then(books => res.send(books[0]))
-    .catch(err => res.status(404).send(err))
-}
+    req: Request,
+    res: Response
+) =>
+        retrieveBook(req.params.did, redis)
+            .then(book => res.send(book))
+            .catch(err => res.status(404).send(err))
 
 const getRentReq = (
-  redis: RedisApi,
-  id: IdentityWallet
+    redis: RedisApi,
+    id: IdentityWallet
 ) => async (
-  req: Request,
-  res: Response
+    req: Request,
+    res: Response
 ) => {
 
-}
+    }
 
 const rentBook = (
-  redis: RedisApi,
-  id: IdentityWallet
+    redis: RedisApi,
+    id: IdentityWallet
 ) => async (
-  req: RequestWithInteractionTokens,
-  res: Response
+    req: RequestWithInteractionTokens,
+    res: Response
 ) => {
-}
+    }
 
 const populateDB = (
-  redis: RedisApi
+    redis: RedisApi
 ) => async (
-  bookList: number[]
+    bookList: Array<{
+        isbn: number,
+        idw: IdentityWallet
+    }>
 ) => {
-  Promise.all(bookList.map(isbn => ISBN.resolve(isbn)
-                           .then(async (book) => {
-                             const dbBook = await redis.getAsync(isbn.toString());
-                             if (!dbBook || !dbBook.length) {
-                               book.available = true;
-                               await redis.setAsync(isbn.toString(), JSON.stringify(book))
-                             }
-                           })
-                           .catch(console.log)))
-}
+        bookList.map(book => ISBN.resolve(book.isbn)
+            .then(async (bookDetails) => {
+                const dbBook = await redis.getAsync(book.idw.did)
+                if (!dbBook || !dbBook.length) {
+                    bookDetails.available = true
+                    bookDetails.did = book.idw.did
+                    await redis.setAsync(book.idw.did, JSON.stringify(bookDetails))
+                }
+                const dbDID_ISBN = await redis.getAsync(book.isbn.toString())
+                if (!dbDID_ISBN || !dbDID_ISBN.length) {
+                    await redis.setAsync(book.isbn.toString(), book.idw.did)
+                }
+            })
+            .catch(console.error))
+    }
 
 export const library = {
-  getBooks,
-  getBookDetails,
-  populateDB
-};
+    getBooks,
+    getBookDetails,
+    getRentReq,
+    rentBook,
+    populateDB
+}
