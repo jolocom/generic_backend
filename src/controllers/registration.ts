@@ -1,4 +1,4 @@
-import { Response } from 'express'
+import { Request, Response } from 'express'
 import { IdentityWallet } from 'jolocom-lib/js/identityWallet/identityWallet'
 
 import { RedisApi, RequestWithInteractionTokens } from '../types'
@@ -21,7 +21,7 @@ import { applyValidationFunction } from '../helpers/validators'
 const generateCredentialShareRequest = (
   identityWallet: IdentityWallet,
   redis: RedisApi
-) => async (req: RequestWithInteractionTokens, res: Response) => {
+) => async (req: Request, res: Response) => {
   const callbackURL = `${serviceUrl}${Endpoints.authn}`
 
   const credentialRequest = await identityWallet.create.interactionTokens.request.share(

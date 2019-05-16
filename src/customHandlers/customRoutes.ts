@@ -5,17 +5,46 @@ import {
     bookList,
     password
 } from '../config'
-import { setupLibrary } from '../helpers/books';
-import { IdentityWallet } from 'jolocom-lib/js/identityWallet/identityWallet';
+import { setupLibrary } from '../helpers/books'
+import { IdentityWallet } from 'jolocom-lib/js/identityWallet/identityWallet'
+import {
+    matchAgainstRequest,
+    validateCredentialsAgainstRequest,
+    validateSentInteractionToken
+} from './../middleware'
+import { registration } from './../controllers/registration'
 
-export const configureCustomRoutes = async (app: Express, redis: RedisApi, identityWallet: IdentityWallet) =>
-    library.populateDB(redis)(setupLibrary(identityWallet, password, bookList))
-        .then(_ => {
-            app
-                .route('/books/')
-                .get(library.getBooks(redis))
+export const configureCustomRoutes = async (app: Express, redis: RedisApi, identityWallet: IdentityWallet) => {
+    const books = setupLibrary(identityWallet, password, bookList)
+    const bookIdws = books.map(book => book.idw)
+    await library.populateDB(redis)(books)
 
-            app
-                .route('/book/:did')
-                .get(library.getBookDetails(redis))
-        })
+    app
+        .route('/books/')
+        .get(library.getBooks(redis))
+
+    app
+        .route('/book/:did')
+        .get(library.getBookDetails(redis))
+
+    app
+        .route('/rent/:did')
+        .get(library.getRentReq(redis, bookIdws))
+        .post(
+            validateSentInteractionToken,
+            matchAgainstRequest(redis),
+            validateCredentialsAgainstRequest,
+            library.rentBook(redis),
+            registration.consumeCredentialShareResponse(redis)
+        )
+
+    app
+        .route('/return/:did')
+        .get(library.getReturnReq(redis, bookIdws))
+        .post(validateSentInteractionToken,
+            matchAgainstRequest(redis),
+            validateCredentialsAgainstRequest,
+            library.returnBook(redis),
+            registration.consumeCredentialShareResponse(redis)
+        )
+}

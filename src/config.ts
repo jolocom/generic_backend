@@ -1,5 +1,5 @@
-import { BaseMetadata } from 'cred-types-jolocom-core'
-import { claimsMetadata as demoClaimsMetadata } from 'cred-types-jolocom-demo'
+import { BaseMetadata,
+         claimsMetadata} from 'cred-types-jolocom-core'
 import { ICredentialReqSection } from './types'
 import { config } from 'dotenv'
 
@@ -19,15 +19,15 @@ export const password = process.env.PASSWORD
 export const port = process.env.PORT
 
 /* Where is your service deployed. E.g. https://demo-sso.jolocom.com, used by the frontend */
-export const serviceUrl = 'http://192.168.2.109:9000'
+export const serviceUrl = 'papyri://ret'
 
 /* Credentials required during authentication */
-export const currentCredentialRequirements = ['jolocom']
+export const currentCredentialRequirements = ['e-mail']
 
 /* Credentials offered to users */
 export const credentialRequirements = {
-    'jolocom': {
-        metadata: demoClaimsMetadata.akaart
+    'e-mail': {
+        metadata: claimsMetadata.emailAddress
     }
 } as { [key: string]: ICredentialReqSection }
 

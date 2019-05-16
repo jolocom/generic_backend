@@ -24,31 +24,35 @@ export const setupDID = async (kp: IVaultedKeyProvider, pass: string): Promise<I
 }
 
 export const setupLibrary = (libIdw: IdentityWallet, password: string, booklist: number[]) => {
-    const reg = JolocomLib.registries.jolocom.create()
     return booklist
         .map((isbn: number): { isbn: number, idw: IdentityWallet } => {
-            const vkp = new JolocomLib.KeyProvider(Buffer.from(hash({
-                bookISBN: isbn,
-                libDID: libIdw.did
-            })), password)
-            const id = Identity.fromDidDocument({
-                didDocument: DidDocument.fromPublicKey(vkp.getPublicKey({
-                    derivationPath: JolocomLib.KeyTypes.jolocomIdentityKey,
-                    encryptionPass: password
-                }))
-            })
             return {
                 isbn: isbn,
-                idw: new IdentityWallet({
-                    identity: id,
-                    vaultedKeyProvider: vkp,
-                    publicKeyMetadata: {
-                        derivationPath: JolocomLib.KeyTypes.jolocomIdentityKey,
-                        keyId: id.didDocument.publicKey[0].id
-                    },
-                    contractsAdapter: reg.contractsAdapter,
-                    contractsGateway: reg.contractsGateway
-                })
+                idw: isbnToIdw(libIdw.did, password, isbn)
             }
         })
+}
+
+export const isbnToIdw = (libDid: string, password: string, isbn: number): IdentityWallet => {
+    const reg = JolocomLib.registries.jolocom.create()
+    const vkp = new JolocomLib.KeyProvider(Buffer.from(hash({
+        bookISBN: isbn,
+        libDID: libDid
+    })), password)
+    const id = Identity.fromDidDocument({
+        didDocument: DidDocument.fromPublicKey(vkp.getPublicKey({
+            derivationPath: JolocomLib.KeyTypes.jolocomIdentityKey,
+            encryptionPass: password
+        }))
+    })
+    return new IdentityWallet({
+        identity: id,
+        vaultedKeyProvider: vkp,
+        publicKeyMetadata: {
+            derivationPath: JolocomLib.KeyTypes.jolocomIdentityKey,
+            keyId: id.didDocument.publicKey[0].id
+        },
+        contractsAdapter: reg.contractsAdapter,
+        contractsGateway: reg.contractsGateway
+    })
 }
