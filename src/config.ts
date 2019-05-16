@@ -20,7 +20,7 @@ export const password = process.env.PASSWORD
 export const port = process.env.PORT
 
 /* Where is your service deployed. E.g. https://demo-sso.jolocom.com, used by the frontend */
-export const serviceUrl = 'papyri://response/'
+export const serviceUrl = 'papyri://'
 
 /* Credentials required during authentication */
 export const currentCredentialRequirements = ['e-mail']
