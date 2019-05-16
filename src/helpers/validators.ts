@@ -1,6 +1,6 @@
 import { SignedCredential } from 'jolocom-lib/js/credentials/signedCredential/signedCredential'
 import { credentialRequirements } from '../config'
-const validate = require('email-validator')
+const validator = require('email-validator')
 
 // TODO test this better
 export const applyValidationFunction = (credential: SignedCredential) => {
@@ -22,7 +22,7 @@ export const validateEmailCredential = (whitelistedValues: string[]) => ({
 }) =>
   whitelistedValues.some(allowed =>
     allowed.startsWith('@')
-      ? validate(claim.email) && claim.email.endsWith(allowed)
+      ? validator.validate(claim.email) && claim.email.endsWith(allowed)
       : whitelistedValues.includes(claim.email)
   )
 

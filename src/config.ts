@@ -2,6 +2,7 @@ import { BaseMetadata,
          claimsMetadata} from 'cred-types-jolocom-core'
 import { ICredentialReqSection } from './types'
 import { config } from 'dotenv'
+import { validateEmailCredential } from './helpers/validators';
 
 config()
 
@@ -19,7 +20,7 @@ export const password = process.env.PASSWORD
 export const port = process.env.PORT
 
 /* Where is your service deployed. E.g. https://demo-sso.jolocom.com, used by the frontend */
-export const serviceUrl = 'papyri://ret'
+export const serviceUrl = 'papyri://response/'
 
 /* Credentials required during authentication */
 export const currentCredentialRequirements = ['e-mail']
@@ -27,7 +28,8 @@ export const currentCredentialRequirements = ['e-mail']
 /* Credentials offered to users */
 export const credentialRequirements = {
     'e-mail': {
-        metadata: claimsMetadata.emailAddress
+        metadata: claimsMetadata.emailAddress,
+        credentialValidator: validateEmailCredential(['@jolocom.com'])
     }
 } as { [key: string]: ICredentialReqSection }
 

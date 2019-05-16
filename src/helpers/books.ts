@@ -5,7 +5,6 @@ import { IdentityWallet } from 'jolocom-lib/js/identityWallet/identityWallet'
 import { Identity } from 'jolocom-lib/js/identity/identity';
 import { DidDocument } from 'jolocom-lib/js/identity/didDocument/didDocument';
 import * as hash from 'object-hash'
-import { JolocomRegistry } from 'jolocom-lib/js/registries/jolocomRegistry';
 
 export const setupDID = async (kp: IVaultedKeyProvider, pass: string): Promise<IdentityWallet> => {
     const reg = JolocomLib.registries.jolocom.create();

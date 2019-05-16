@@ -33,7 +33,7 @@ const getBookDetails = (
 
 const getRentReq = (
     redis: RedisApi,
-    books: Array<IdentityWallet>
+    books: IdentityWallet[]
 ) => async (
     req: Request,
     res: Response
@@ -122,16 +122,10 @@ const populateDB = (
 ) => {
         bookList.map(book => ISBN.resolve(book.isbn)
             .then(async (bookDetails) => {
-                const dbBook = await redis.getAsync(book.idw.did)
-                if (!dbBook || !dbBook.length) {
-                    bookDetails.available = true
-                    bookDetails.did = book.idw.did
-                    await redis.setAsync(book.idw.did, JSON.stringify(bookDetails))
-                }
-                const dbDID_ISBN = await redis.getAsync(book.isbn.toString())
-                if (!dbDID_ISBN || !dbDID_ISBN.length) {
-                    await redis.setAsync(book.isbn.toString(), book.idw.did)
-                }
+                bookDetails.did = book.idw.did
+                bookDetails.available = true
+                await redis.setAsync(book.idw.did, JSON.stringify(bookDetails))
+                await redis.setAsync(book.isbn.toString(), book.idw.did)
             })
             .catch(console.error))
     }

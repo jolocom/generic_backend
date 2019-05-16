@@ -30,17 +30,12 @@ export const configureCustomRoutes = async (app: Express, redis: RedisApi, ident
     app
         .route('/rent/:did')
         .get(library.getRentReq(redis, bookIdws))
-        .post(
-            validateSentInteractionToken,
-            matchAgainstRequest(redis),
-            validateCredentialsAgainstRequest,
-            library.rentBook(redis),
-            registration.consumeCredentialShareResponse(redis)
-        )
 
     app
         .route('/return/:did')
         .get(library.getReturnReq(redis, bookIdws))
+
+    app.route('/authenticate/')
         .post(validateSentInteractionToken,
             matchAgainstRequest(redis),
             validateCredentialsAgainstRequest,
