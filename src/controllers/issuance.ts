@@ -12,11 +12,14 @@ const generateCredentialOffer = (
   const { credentialType } = req.params
 
   try {
+    const {type: offeredType} = credentialOffers[credentialType]
+
     const credOffer = await identityWallet.create.interactionTokens.request.offer(
       {
         callbackURL: `${serviceUrl}/receive/${credentialType}`,
-        requestedInput: {},
-        instant: true
+        offeredCredentials: [{
+          type: offeredType[offeredType.length -1]
+        }]
       },
       password
     )
