@@ -31,21 +31,6 @@ const getBookDetails = (
             .then(book => res.send(book))
             .catch(err => res.status(404).send(err))
 
-const getRentReq = (
-    redis: RedisApi,
-    books: IdentityWallet[]
-) => async (
-    req: Request,
-    res: Response
-) => {
-        try {
-            const book = books.filter(b => b.did === req.params.did)[0]
-            registration.generateCredentialShareRequest(book, redis)(req, res)
-        } catch (err) {
-            res.status(404).send("No such book")
-        }
-    }
-
 const rentBook = (
     redis: RedisApi
 ) => async (
@@ -76,8 +61,6 @@ const rentBook = (
         }
         next()
     }
-
-const getReturnReq = getRentReq
 
 const returnBook = (
     redis: RedisApi
@@ -133,9 +116,7 @@ const populateDB = (
 export const library = {
     getBooks,
     getBookDetails,
-    getRentReq,
     rentBook,
-    getReturnReq,
     returnBook,
     populateDB
 }
