@@ -21,7 +21,7 @@ export const configureCustomRoutes = async (app: Express, redis: RedisApi, ident
 
     app
         .route('/login/')
-        .get()
+        .get(registration.generateCredentialShareRequest(identityWallet, redis))
 
     app
         .route('/books/')
