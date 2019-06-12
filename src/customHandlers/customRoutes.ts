@@ -20,6 +20,10 @@ export const configureCustomRoutes = async (app: Express, redis: RedisApi, ident
     await library.populateDB(redis)(books)
 
     app
+        .route('/login/')
+        .get()
+
+    app
         .route('/books/')
         .get(library.getBooks(redis))
 
@@ -29,17 +33,16 @@ export const configureCustomRoutes = async (app: Express, redis: RedisApi, ident
 
     app
         .route('/rent/:did')
-        .get(library.getRentReq(redis, bookIdws))
+        .post(validateSentInteractionToken,
+              matchAgainstRequest(redis),
+              validateCredentialsAgainstRequest,
+              library.rentBook(redis))
 
     app
         .route('/return/:did')
-        .get(library.getReturnReq(redis, bookIdws))
-
-    app.route('/authenticate/')
         .post(validateSentInteractionToken,
-            matchAgainstRequest(redis),
-            validateCredentialsAgainstRequest,
-            library.returnBook(redis),
-            registration.consumeCredentialShareResponse(redis)
-        )
+              matchAgainstRequest(redis),
+              validateCredentialsAgainstRequest,
+              library.returnBook(redis))
+
 }

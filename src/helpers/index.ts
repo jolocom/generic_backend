@@ -28,10 +28,10 @@ export const generateRequirementsFromConfig = ({
 })
 
 export const setStatusPending = (redis: RedisApi, key: string, data: any) =>
-  redis.setAsync(key, JSON.stringify({ ...data, status: 'pending' }))
+  redis.setAsync(key, JSON.stringify({ ...data, status: 'pending' }), 60 * 60)
 
 export const setStatusDone = (redis: RedisApi, key: string, data: any = {}) =>
-  redis.setAsync(key, JSON.stringify({ ...data, status: 'success' }))
+  redis.setAsync(key, JSON.stringify({ ...data, status: 'success' }), 60 * 60)
 
 export const setDataFromUiForms = (
   redis: RedisApi,
