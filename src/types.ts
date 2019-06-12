@@ -7,7 +7,7 @@ import { BaseMetadata } from 'cred-types-jolocom-demo'
 import { SignedCredential } from 'jolocom-lib/js/credentials/signedCredential/signedCredential'
 
 export interface RedisApi {
-  setAsync: (key: string, value: string) => Promise<void>
+  setAsync: (key: string, value: string, timeout?: number) => Promise<void>
   getAsync: (key: string) => Promise<string>
   delAsync: (key: string) => Promise<void>
 }
