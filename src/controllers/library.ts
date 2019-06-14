@@ -95,16 +95,16 @@ const returnBook = (redis: RedisApi) => async (
 const populateDB = (redis: RedisApi) => async (
   bookList: Array<{
     isbn: number
-    idw: IdentityWallet
+    did: string
   }>
 ) => {
   bookList.map(book =>
     ISBN.resolve(book.isbn)
       .then(async bookDetails => {
-        bookDetails.did = book.idw.did
+        bookDetails.did = book.did
         bookDetails.available = true
-        await redis.setAsync(book.idw.did, JSON.stringify(bookDetails))
-        await redis.setAsync(book.isbn.toString(), book.idw.did)
+        await redis.setAsync(book.did, JSON.stringify(bookDetails))
+        await redis.setAsync(book.isbn.toString(), book.did)
       })
       .catch(console.error)
   )
