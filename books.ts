@@ -18,7 +18,7 @@ export interface LibraryBook extends Book {
   reads: number
 }
 
-export const books: Book[] = [
+export const uniqueBooks: Book[] = [
   {
     ISBN: 9781623170745,
     title: "Free to Make: How the Maker Movement is Changing Our Schools, Our Jobs, and Our Minds",
@@ -29,7 +29,7 @@ export const books: Book[] = [
     bodyTextColor: "000000",
     totalPages: 271,
     tags: ["social revolution", "technology", "community"],
-    image: ""
+    image: "https://papyri.jolocom.com/assets/covers/9781623170745.png"
   },
   {
     ISBN: 9781937146580,
@@ -41,7 +41,7 @@ export const books: Book[] = [
     bodyTextColor: "000000",
     totalPages: 194,
     tags: ["bitcoin", "cryptocurrency", "innovation"],
-    image: ""
+    image: "https://papyri.jolocom.com/assets/covers/9781937146580.png"
   },
   {
     ISBN: 9780990489177,
@@ -53,7 +53,7 @@ export const books: Book[] = [
     bodyTextColor: "FF7837",
     totalPages: 355,
     tags: ["shared economy", "social good", "sustainable economy"],
-    image: ""
+    image: "https://papyri.jolocom.com/assets/covers/9780990489177.png"
   },
   {
     ISBN: 9781719127141,
@@ -65,7 +65,7 @@ export const books: Book[] = [
     bodyTextColor: "FFEC00",
     totalPages: 233,
     tags: ["consensus mechanisms", "bureaucracy", "administration"],
-    image: ""
+    image: "https://papyri.jolocom.com/assets/covers/9781719127141.png"
   },
   {
     ISBN: 9781523930470,
@@ -77,7 +77,7 @@ export const books: Book[] = [
     bodyTextColor: "787878",
     totalPages: 219,
     tags: ["Ethereum", "smart contracts", "decentralisation"],
-    image: ""
+    image: "https://papyri.jolocom.com/assets/covers/9781523930470.png"
   },
   {
     ISBN: 9780393634990,
@@ -89,7 +89,7 @@ export const books: Book[] = [
     bodyTextColor: "ffffff",
     totalPages: 207,
     tags: ["AI", "perception", "responsibility", "experiments"],
-    image: ""
+    image: "https://papyri.jolocom.com/assets/covers/9780393634990.png"
   },
   {
     ISBN: 9780198739838,
@@ -101,7 +101,7 @@ export const books: Book[] = [
     bodyTextColor: "7F2F2C",
     totalPages: 358,
     tags: ["experiments", "AI", "human brain"],
-    image: ""
+    image: "https://papyri.jolocom.com/assets/covers/9780198739838.png"
   },
   {
     ISBN: 9780062018205,
@@ -113,7 +113,7 @@ export const books: Book[] = [
     bodyTextColor: "000000",
     totalPages: 325,
     tags: ["experiments", "human brain", "perception"],
-    image: ""
+    image: "https://papyri.jolocom.com/assets/covers/9780062018205.png"
   },
   {
     ISBN: 9780241957219,
@@ -125,7 +125,7 @@ export const books: Book[] = [
     bodyTextColor: "000000",
     totalPages: 362,
     tags: ["digital networks", "AI", "privacy"],
-    image: ""
+    image: "https://papyri.jolocom.com/assets/covers/9780241957219.png"
   },
   {
     ISBN: 9780465094257,
@@ -137,7 +137,7 @@ export const books: Book[] = [
     bodyTextColor: "948FA5",
     totalPages: 248,
     tags: ["physics", "hunam brain", "perception"],
-    image: ""
+    image: "https://papyri.jolocom.com/assets/covers/9780465094257.png"
   },
   {
     ISBN: 9780316508278,
@@ -149,7 +149,7 @@ export const books: Book[] = [
     bodyTextColor: "060D6B",
     totalPages: 286,
     tags: ["monopolization", "content", "platforms"],
-    image: ""
+    image: "https://papyri.jolocom.com/assets/covers/9780316508278.png"
   },
   {
     ISBN: 9780262029575,
@@ -161,7 +161,7 @@ export const books: Book[] = [
     bodyTextColor: "000000",
     totalPages: 365,
     tags: ["smart contracts", "system thinking", "social change"],
-    image: ""
+    image: "https://papyri.jolocom.com/assets/covers/9780262029575.png"
   },
   {
     ISBN: 9781787330672,
@@ -173,7 +173,7 @@ export const books: Book[] = [
     bodyTextColor: "000000",
     totalPages: 321,
     tags: ["history review", "social change", "human brain"],
-    image: ""
+    image: "https://papyri.jolocom.com/assets/covers/9781787330672.png"
   },
   {
     ISBN: 9781250107817,
@@ -185,7 +185,7 @@ export const books: Book[] = [
     bodyTextColor: "000000",
     totalPages: 329,
     tags: ["experiments", "social change", "responsibility"],
-    image: ""
+    image: "https://papyri.jolocom.com/assets/covers/9781250107817.png"
   },
   {
     ISBN: 9781260026672,
@@ -197,6 +197,6 @@ export const books: Book[] = [
     bodyTextColor: "000000",
     totalPages: 284,
     tags: ["cryptocurrency", "smart contracts", "decentralisation"],
-    image: ""
+    image: "https://papyri.jolocom.com/assets/covers/9781260026672.png"
   }
 ]
