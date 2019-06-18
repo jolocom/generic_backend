@@ -4,10 +4,31 @@ import { bookList } from '../config'
 import { NextFunction } from 'express-serve-static-core'
 import { LibraryBook } from '../books'
 
+interface UserBook {
+  bookDid: string
+  progress: number
+}
+
 const retrieveBook = async (did: string, redis: RedisApi) =>
   JSON.parse(await redis.getAsync(did))
 const retrieveDID = async (isbn: number, redis: RedisApi) =>
   await redis.getAsync(isbn.toString())
+
+const getUserBooks = async (did: string, redis: RedisApi): Promise<UserBook[]> =>
+  redis.getAsync(did).then(bs => {
+    const books = JSON.parse(bs)
+    if (books) {
+      return books as UserBook[]
+    } else {
+      return []
+    }
+  }).catch(_ => {
+    return []
+  })
+
+const storeUserBook = async (did: string, book: UserBook, redis: RedisApi) =>
+  getUserBooks(did, redis)
+  .then(userBooks => redis.setAsync(did, JSON.stringify([...userBooks, book])))
 
 const getBooks = (redis: RedisApi) => async (req: Request, res: Response) =>
   Promise.all(
