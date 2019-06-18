@@ -37,8 +37,11 @@ const getUserBooks = async (
       return []
     })
 
-const storeUserBooks = async (did: string, books: UserBook[], redis: RedisApi) =>
-  redis.setAsync(did, JSON.stringify(books))
+const storeUserBooks = async (
+  did: string,
+  books: UserBook[],
+  redis: RedisApi
+) => redis.setAsync(did, JSON.stringify(books))
 
 const getBooks = (redis: RedisApi) => async (req: Request, res: Response) =>
   Promise.all(
@@ -73,7 +76,11 @@ const rentBook = (redis: RedisApi) => async (
 
       // add book to user table
       const userBooks = await getUserBooks(userDid, redis)
-      await storeUserBooks(userDid, [...userBooks, {bookDid, progress: 0}], redis)
+      await storeUserBooks(
+        userDid,
+        [...userBooks, { bookDid, progress: 0 }],
+        redis
+      )
       await redis.setAsync(bookDid, JSON.stringify(book))
     } else {
       res.status(403).send('Book Unavailable')
@@ -110,6 +117,62 @@ const returnBook = (redis: RedisApi) => async (
       res.status(403).send('Book not rented to you')
     }
   } catch (err) {
+    console.log(err)
+    res.status(403).send('Book not rented to you')
+  }
+  next()
+}
+
+const getProgress = (redis: RedisApi) => async (
+  req: RequestWithInteractionTokens,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const bookDid = req.body.did
+    const userDid = req.userResponseToken.issuer
+
+    const userBooks = await getUserBooks(userDid, redis)
+    const userBook = userBooks.filter(book => book.bookDid === bookDid)
+    res.send(userBook[0].progress)
+  } catch (err) {
+    console.error(err)
+    res.status(403).send('Book not rented to you')
+  }
+  next()
+}
+
+const getAllProgress = (redis: RedisApi) => async (
+  req: RequestWithInteractionTokens,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userDid = req.userResponseToken.issuer
+    res.send(await getUserBooks(userDid, redis))
+  } catch (err) {
+    console.error(err)
+    res.status(403).send('User has no books')
+  }
+  next()
+}
+
+const setProgress = (redis: RedisApi) => async (
+  req: RequestWithInteractionTokens,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const bookDid = req.body.did
+    const userDid = req.userResponseToken.issuer
+
+    const userBooks = await getUserBooks(userDid, redis)
+    const newUserBooks = userBooks.map(book =>
+      book.bookDid === bookDid ? { bookDid, progress: req.body.progress } : book
+    )
+    await storeUserBooks(userDid, newUserBooks, redis)
+  } catch (err) {
+    console.error(err)
     res.status(403).send('Book not rented to you')
   }
   next()
@@ -127,5 +190,8 @@ export const library = {
   getBookDetails,
   rentBook,
   returnBook,
+  getProgress,
+  getAllProgress,
+  setProgress,
   populateDB
 }
