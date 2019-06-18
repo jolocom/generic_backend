@@ -1,6 +1,6 @@
-import { BaseMetadata } from 'cred-types-jolocom-core'
-import { claimsMetadata as demoClaimsMetadata } from 'cred-types-jolocom-demo'
+import { BaseMetadata, claimsMetadata } from 'cred-types-jolocom-core'
 import { ICredentialReqSection } from './types'
+import { validateEmailCredential } from './helpers/validators';
 
 /**
  * The seed to instantiate a vaulted key provider and password for seed encryption / decryption
@@ -14,15 +14,16 @@ export const seed = Buffer.from(
 export const password = 'correct horse battery staple'
 
 /* Where is your service deployed. E.g. https://demo-sso.jolocom.com, used by the frontend */
-export const serviceUrl = 'http://192.168.2.109:9000'
+export const serviceUrl = 'https://60838dbf.ngrok.io'
 
 /* Credentials required during authentication */
-export const currentCredentialRequirements = ['a-kaart']
+export const currentCredentialRequirements = ['email']
 
 /* Credentials offered to users */
 export const credentialRequirements = {
-  'a-kaart': {
-    metadata: demoClaimsMetadata.akaart
+  'email': {
+    metadata: claimsMetadata.emailAddress,
+    credentialValidator: validateEmailCredential(['@jolocom.com'])
   }
 } as { [key: string]: ICredentialReqSection }
 

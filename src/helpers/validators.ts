@@ -22,7 +22,7 @@ export const validateEmailCredential = (whitelistedValues: string[]) => ({
 }) =>
   whitelistedValues.some(allowed =>
     allowed.startsWith('@')
-      ? validate(claim.email) && claim.email.endsWith(allowed)
+      ? validate.validate(claim.email) && claim.email.endsWith(allowed)
       : whitelistedValues.includes(claim.email)
   )
 
