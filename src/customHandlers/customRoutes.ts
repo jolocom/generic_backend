@@ -2,7 +2,6 @@ import { RedisApi } from 'src/types'
 import { Express } from 'express'
 import { library } from '../controllers/library'
 import {
-    bookList,
     password
 } from '../config'
 import { setupLibrary } from '../helpers/books'
@@ -13,10 +12,10 @@ import {
     validateSentInteractionToken
 } from './../middleware'
 import { registration } from './../controllers/registration'
+import { uniqueBooks } from 'books'
 
 export const configureCustomRoutes = async (app: Express, redis: RedisApi, identityWallet: IdentityWallet) => {
-    const books = setupLibrary(identityWallet, password, bookList)
-    const bookIdws = books.map(book => book.idw)
+    const books = setupLibrary(identityWallet, password, uniqueBooks)
     await library.populateDB(redis)(books)
 
     app

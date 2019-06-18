@@ -9,13 +9,13 @@ export interface Book {
   bodyTextColor: string
   totalPages: number
   tags: string[],
-  image: string
 }
 
 export interface LibraryBook extends Book {
   available: boolean
   did: string
   reads: number
+  image: string
 }
 
 export const uniqueBooks: Book[] = [
@@ -29,7 +29,6 @@ export const uniqueBooks: Book[] = [
     bodyTextColor: "000000",
     totalPages: 271,
     tags: ["social revolution", "technology", "community"],
-    image: "https://papyri.jolocom.com/assets/covers/9781623170745.png"
   },
   {
     ISBN: 9781937146580,
@@ -41,7 +40,6 @@ export const uniqueBooks: Book[] = [
     bodyTextColor: "000000",
     totalPages: 194,
     tags: ["bitcoin", "cryptocurrency", "innovation"],
-    image: "https://papyri.jolocom.com/assets/covers/9781937146580.png"
   },
   {
     ISBN: 9780990489177,
@@ -53,7 +51,6 @@ export const uniqueBooks: Book[] = [
     bodyTextColor: "FF7837",
     totalPages: 355,
     tags: ["shared economy", "social good", "sustainable economy"],
-    image: "https://papyri.jolocom.com/assets/covers/9780990489177.png"
   },
   {
     ISBN: 9781719127141,
@@ -65,7 +62,6 @@ export const uniqueBooks: Book[] = [
     bodyTextColor: "FFEC00",
     totalPages: 233,
     tags: ["consensus mechanisms", "bureaucracy", "administration"],
-    image: "https://papyri.jolocom.com/assets/covers/9781719127141.png"
   },
   {
     ISBN: 9781523930470,
@@ -77,7 +73,6 @@ export const uniqueBooks: Book[] = [
     bodyTextColor: "787878",
     totalPages: 219,
     tags: ["Ethereum", "smart contracts", "decentralisation"],
-    image: "https://papyri.jolocom.com/assets/covers/9781523930470.png"
   },
   {
     ISBN: 9780393634990,
@@ -89,7 +84,6 @@ export const uniqueBooks: Book[] = [
     bodyTextColor: "ffffff",
     totalPages: 207,
     tags: ["AI", "perception", "responsibility", "experiments"],
-    image: "https://papyri.jolocom.com/assets/covers/9780393634990.png"
   },
   {
     ISBN: 9780198739838,
@@ -101,7 +95,6 @@ export const uniqueBooks: Book[] = [
     bodyTextColor: "7F2F2C",
     totalPages: 358,
     tags: ["experiments", "AI", "human brain"],
-    image: "https://papyri.jolocom.com/assets/covers/9780198739838.png"
   },
   {
     ISBN: 9780062018205,
@@ -113,7 +106,6 @@ export const uniqueBooks: Book[] = [
     bodyTextColor: "000000",
     totalPages: 325,
     tags: ["experiments", "human brain", "perception"],
-    image: "https://papyri.jolocom.com/assets/covers/9780062018205.png"
   },
   {
     ISBN: 9780241957219,
@@ -125,7 +117,6 @@ export const uniqueBooks: Book[] = [
     bodyTextColor: "000000",
     totalPages: 362,
     tags: ["digital networks", "AI", "privacy"],
-    image: "https://papyri.jolocom.com/assets/covers/9780241957219.png"
   },
   {
     ISBN: 9780465094257,
@@ -137,7 +128,6 @@ export const uniqueBooks: Book[] = [
     bodyTextColor: "948FA5",
     totalPages: 248,
     tags: ["physics", "hunam brain", "perception"],
-    image: "https://papyri.jolocom.com/assets/covers/9780465094257.png"
   },
   {
     ISBN: 9780316508278,
@@ -149,7 +139,6 @@ export const uniqueBooks: Book[] = [
     bodyTextColor: "060D6B",
     totalPages: 286,
     tags: ["monopolization", "content", "platforms"],
-    image: "https://papyri.jolocom.com/assets/covers/9780316508278.png"
   },
   {
     ISBN: 9780262029575,
@@ -161,7 +150,6 @@ export const uniqueBooks: Book[] = [
     bodyTextColor: "000000",
     totalPages: 365,
     tags: ["smart contracts", "system thinking", "social change"],
-    image: "https://papyri.jolocom.com/assets/covers/9780262029575.png"
   },
   {
     ISBN: 9781787330672,
@@ -173,7 +161,6 @@ export const uniqueBooks: Book[] = [
     bodyTextColor: "000000",
     totalPages: 321,
     tags: ["history review", "social change", "human brain"],
-    image: "https://papyri.jolocom.com/assets/covers/9781787330672.png"
   },
   {
     ISBN: 9781250107817,
@@ -185,7 +172,6 @@ export const uniqueBooks: Book[] = [
     bodyTextColor: "000000",
     totalPages: 329,
     tags: ["experiments", "social change", "responsibility"],
-    image: "https://papyri.jolocom.com/assets/covers/9781250107817.png"
   },
   {
     ISBN: 9781260026672,
@@ -197,6 +183,5 @@ export const uniqueBooks: Book[] = [
     bodyTextColor: "000000",
     totalPages: 284,
     tags: ["cryptocurrency", "smart contracts", "decentralisation"],
-    image: "https://papyri.jolocom.com/assets/covers/9781260026672.png"
   }
 ]

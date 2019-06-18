@@ -3,6 +3,7 @@ import { publicKeyToDID } from 'jolocom-lib/js/utils/crypto'
 import { IVaultedKeyProvider } from 'jolocom-lib/js/vaultedKeyProvider/types'
 import { IdentityWallet } from 'jolocom-lib/js/identityWallet/identityWallet'
 import * as hash from 'object-hash'
+import { Book, LibraryBook } from 'books'
 
 export const setupDID = async (
   kp: IVaultedKeyProvider,
@@ -28,20 +29,21 @@ export const setupDID = async (
 export const setupLibrary = (
   libIdw: IdentityWallet,
   password: string,
-  booklist: number[]
-) =>
-  booklist.map((isbn: number): { isbn: number; did: string } => {
-    return {
-      isbn: isbn,
-      did: isbnToDID(libIdw.did, password, isbn)
-    }
-  })
+  booklist: Book[]
+): LibraryBook[] =>
+  booklist.map(book => ({
+    ...book,
+    available: true,
+    did: isbnToDID(libIdw.did, password, book.ISBN),
+    reads: 0,
+    image: `https://papyri.jolocom.com/assets/covers/${book.ISBN}.png`
+  }))
 
 export const isbnToDID = (
   libDid: string,
   password: string,
   isbn: number,
-  occurance: number = 0
+  occurance = 0
 ): string => {
   const vkp = new JolocomLib.KeyProvider(
     Buffer.from(
