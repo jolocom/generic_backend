@@ -2,7 +2,7 @@ import { Response, Request } from 'express'
 import { RedisApi, RequestWithInteractionTokens } from '../types'
 import { bookList } from '../config'
 import { NextFunction } from 'express-serve-static-core'
-import { LibraryBook } from 'books';
+import { LibraryBook } from '../books'
 
 const retrieveBook = async (did: string, redis: RedisApi) =>
   JSON.parse(await redis.getAsync(did))
@@ -90,14 +90,11 @@ const returnBook = (redis: RedisApi) => async (
   next()
 }
 
-const populateDB = (redis: RedisApi) => async (
-  bookList: LibraryBook[]
-) => {
+const populateDB = (redis: RedisApi) => async (bookList: LibraryBook[]) => {
   bookList.forEach(async book => {
-        await redis.setAsync(book.did, JSON.stringify(book))
-        await redis.setAsync(book.ISBN.toString(), book.did)
-      }
-  )
+    await redis.setAsync(book.did, JSON.stringify(book))
+    await redis.setAsync(book.ISBN.toString(), book.did)
+  })
 }
 
 export const library = {

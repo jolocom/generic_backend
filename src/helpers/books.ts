@@ -3,7 +3,7 @@ import { publicKeyToDID } from 'jolocom-lib/js/utils/crypto'
 import { IVaultedKeyProvider } from 'jolocom-lib/js/vaultedKeyProvider/types'
 import { IdentityWallet } from 'jolocom-lib/js/identityWallet/identityWallet'
 import * as hash from 'object-hash'
-import { Book, LibraryBook } from 'books'
+import { Book, LibraryBook } from '../books'
 
 export const setupDID = async (
   kp: IVaultedKeyProvider,
