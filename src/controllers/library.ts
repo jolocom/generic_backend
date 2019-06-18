@@ -1,10 +1,8 @@
 import { Response, Request } from 'express'
 import { RedisApi, RequestWithInteractionTokens } from '../types'
-import * as ISBN from 'node-isbn'
 import { bookList } from '../config'
-import { IdentityWallet } from 'jolocom-lib/js/identityWallet/identityWallet'
 import { NextFunction } from 'express-serve-static-core'
-import { registration } from './registration'
+import { LibraryBook } from '../books'
 
 const retrieveBook = async (did: string, redis: RedisApi) =>
   JSON.parse(await redis.getAsync(did))
@@ -92,22 +90,11 @@ const returnBook = (redis: RedisApi) => async (
   next()
 }
 
-const populateDB = (redis: RedisApi) => async (
-  bookList: Array<{
-    isbn: number
-    idw: IdentityWallet
-  }>
-) => {
-  bookList.map(book =>
-    ISBN.resolve(book.isbn)
-      .then(async bookDetails => {
-        bookDetails.did = book.idw.did
-        bookDetails.available = true
-        await redis.setAsync(book.idw.did, JSON.stringify(bookDetails))
-        await redis.setAsync(book.isbn.toString(), book.idw.did)
-      })
-      .catch(console.error)
-  )
+const populateDB = (redis: RedisApi) => async (bookList: LibraryBook[]) => {
+  bookList.forEach(async book => {
+    await redis.setAsync(book.did, JSON.stringify(book))
+    await redis.setAsync(book.ISBN.toString(), book.did)
+  })
 }
 
 export const library = {

@@ -2,56 +2,64 @@ import { JolocomLib } from 'jolocom-lib'
 import { publicKeyToDID } from 'jolocom-lib/js/utils/crypto'
 import { IVaultedKeyProvider } from 'jolocom-lib/js/vaultedKeyProvider/types'
 import { IdentityWallet } from 'jolocom-lib/js/identityWallet/identityWallet'
-import { Identity } from 'jolocom-lib/js/identity/identity';
-import { DidDocument } from 'jolocom-lib/js/identity/didDocument/didDocument';
 import * as hash from 'object-hash'
+import { Book, LibraryBook } from '../books'
 
-export const setupDID = async (kp: IVaultedKeyProvider, pass: string): Promise<IdentityWallet> => {
-    const reg = JolocomLib.registries.jolocom.create();
-    try {
-        return reg.authenticate(kp, {
-            derivationPath: JolocomLib.KeyTypes.jolocomIdentityKey,
-            encryptionPass: pass
-        })
-    } catch (err) {
-        await JolocomLib.util.fuelKeyWithEther(kp.getPublicKey({
-            derivationPath: JolocomLib.KeyTypes.ethereumKey,
-            encryptionPass: pass
-        }))
-        return reg.create(kp, pass)
-    }
+export const setupDID = async (
+  kp: IVaultedKeyProvider,
+  pass: string
+): Promise<IdentityWallet> => {
+  const reg = JolocomLib.registries.jolocom.create()
+  try {
+    return reg.authenticate(kp, {
+      derivationPath: JolocomLib.KeyTypes.jolocomIdentityKey,
+      encryptionPass: pass
+    })
+  } catch (err) {
+    await JolocomLib.util.fuelKeyWithEther(
+      kp.getPublicKey({
+        derivationPath: JolocomLib.KeyTypes.ethereumKey,
+        encryptionPass: pass
+      })
+    )
+    return reg.create(kp, pass)
+  }
 }
 
-export const setupLibrary = (libIdw: IdentityWallet, password: string, booklist: number[]) => {
-    return booklist
-        .map((isbn: number): { isbn: number, idw: IdentityWallet } => {
-            return {
-                isbn: isbn,
-                idw: isbnToIdw(libIdw.did, password, isbn)
-            }
-        })
-}
+export const setupLibrary = (
+  libIdw: IdentityWallet,
+  password: string,
+  booklist: Book[]
+): LibraryBook[] =>
+  booklist.map(book => ({
+    ...book,
+    available: true,
+    did: isbnToDID(libIdw.did, password, book.ISBN),
+    reads: 0,
+    image: `https://papyri.jolocom.com/assets/covers/${book.ISBN}.png`
+  }))
 
-export const isbnToIdw = (libDid: string, password: string, isbn: number): IdentityWallet => {
-    const reg = JolocomLib.registries.jolocom.create()
-    const vkp = new JolocomLib.KeyProvider(Buffer.from(hash({
+export const isbnToDID = (
+  libDid: string,
+  password: string,
+  isbn: number,
+  occurance = 0
+): string => {
+  const vkp = new JolocomLib.KeyProvider(
+    Buffer.from(
+      hash({
         bookISBN: isbn,
-        libDID: libDid
-    })), password)
-    const id = Identity.fromDidDocument({
-        didDocument: DidDocument.fromPublicKey(vkp.getPublicKey({
-            derivationPath: JolocomLib.KeyTypes.jolocomIdentityKey,
-            encryptionPass: password
-        }))
+        libDID: libDid,
+        occurance
+      })
+    ),
+    password
+  )
+
+  return publicKeyToDID(
+    vkp.getPublicKey({
+      derivationPath: JolocomLib.KeyTypes.jolocomIdentityKey,
+      encryptionPass: password
     })
-    return new IdentityWallet({
-        identity: id,
-        vaultedKeyProvider: vkp,
-        publicKeyMetadata: {
-            derivationPath: JolocomLib.KeyTypes.jolocomIdentityKey,
-            keyId: id.didDocument.publicKey[0].id
-        },
-        contractsAdapter: reg.contractsAdapter,
-        contractsGateway: reg.contractsGateway
-    })
+  )
 }
