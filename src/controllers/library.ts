@@ -10,25 +10,35 @@ interface UserBook {
 }
 
 const retrieveBook = async (did: string, redis: RedisApi) =>
-  JSON.parse(await redis.getAsync(did))
-const retrieveDID = async (isbn: number, redis: RedisApi) =>
-  await redis.getAsync(isbn.toString())
-
-const getUserBooks = async (did: string, redis: RedisApi): Promise<UserBook[]> =>
-  redis.getAsync(did).then(bs => {
-    const books = JSON.parse(bs)
-    if (books) {
-      return books as UserBook[]
-    } else {
-      return []
-    }
-  }).catch(_ => {
-    return []
+  redis.getAsync(did).then(maybeBook => {
+    return JSON.parse(maybeBook) as LibraryBook
   })
 
-const storeUserBook = async (did: string, book: UserBook, redis: RedisApi) =>
-  getUserBooks(did, redis)
-  .then(userBooks => redis.setAsync(did, JSON.stringify([...userBooks, book])))
+const retrieveDID = async (isbn: number, redis: RedisApi) =>
+  redis.getAsync(isbn.toString()).then(did => {
+    return did as string
+  })
+
+const getUserBooks = async (
+  did: string,
+  redis: RedisApi
+): Promise<UserBook[]> =>
+  redis
+    .getAsync(did)
+    .then(bs => {
+      const books = JSON.parse(bs)
+      if (books) {
+        return books as UserBook[]
+      } else {
+        return []
+      }
+    })
+    .catch(_ => {
+      return []
+    })
+
+const storeUserBooks = async (did: string, books: UserBook[], redis: RedisApi) =>
+  redis.setAsync(did, JSON.stringify(books))
 
 const getBooks = (redis: RedisApi) => async (req: Request, res: Response) =>
   Promise.all(
@@ -62,16 +72,9 @@ const rentBook = (redis: RedisApi) => async (
       book.available = false
 
       // add book to user table
-      const userBooks = JSON.parse(await redis.getAsync(userDid)) as string[]
-      if (userBooks) {
-        userBooks.push(bookDid)
-        await redis.setAsync(userDid, JSON.stringify(userBooks))
-        await redis.setAsync(bookDid, JSON.stringify(book))
-      } else {
-        const initUserBooks: string[] = [bookDid]
-        await redis.setAsync(userDid, JSON.stringify(initUserBooks))
-        await redis.setAsync(bookDid, JSON.stringify(book))
-      }
+      const userBooks = await getUserBooks(userDid, redis)
+      await storeUserBooks(userDid, [...userBooks, {bookDid, progress: 0}], redis)
+      await redis.setAsync(bookDid, JSON.stringify(book))
     } else {
       res.status(403).send('Book Unavailable')
     }
@@ -96,11 +99,12 @@ const returnBook = (redis: RedisApi) => async (
     if (!book.available) {
       // set book available
       book.available = true
+      book.reads = book.reads + 1
 
       // remove book from user table
-      const userBooks = JSON.parse(await redis.getAsync(userDid)) as string[]
-      const newUserBooks = userBooks.filter(did => did != bookDid)
-      await redis.setAsync(userDid, JSON.stringify(newUserBooks))
+      const userBooks = await getUserBooks(userDid, redis)
+      const newUserBooks = userBooks.filter(book => book.bookDid != bookDid)
+      await storeUserBooks(userDid, newUserBooks, redis)
       await redis.setAsync(bookDid, JSON.stringify(book))
     } else {
       res.status(403).send('Book not rented to you')
