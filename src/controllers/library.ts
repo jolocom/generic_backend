@@ -82,6 +82,7 @@ const rentBook = (redis: RedisApi) => async (
         redis
       )
       await redis.setAsync(bookDid, JSON.stringify(book))
+      res.sendStatus(200)
     } else {
       res.status(403).send('Book Unavailable')
     }
@@ -113,6 +114,7 @@ const returnBook = (redis: RedisApi) => async (
       const newUserBooks = userBooks.filter(book => book.bookDid != bookDid)
       await storeUserBooks(userDid, newUserBooks, redis)
       await redis.setAsync(bookDid, JSON.stringify(book))
+      res.sendStatus(200)
     } else {
       res.status(403).send('Book not rented to you')
     }
@@ -171,6 +173,7 @@ const setProgress = (redis: RedisApi) => async (
       book.bookDid === bookDid ? { bookDid, progress: req.body.progress } : book
     )
     await storeUserBooks(userDid, newUserBooks, redis)
+    res.sendStatus(200)
   } catch (err) {
     console.error(err)
     res.status(403).send('Book not rented to you')
