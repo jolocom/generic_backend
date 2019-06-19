@@ -45,4 +45,28 @@ export const configureCustomRoutes = async (
       validateCredentialsAgainstRequest,
       library.returnBook(redis)
     )
+
+  app
+    .route('/progress/')
+    .get(
+      validateSentInteractionToken,
+      matchAgainstRequest(redis),
+      validateCredentialsAgainstRequest,
+      library.getProgress(redis)
+    )
+    .post(
+      validateSentInteractionToken,
+      matchAgainstRequest(redis),
+      validateCredentialsAgainstRequest,
+      library.setProgress(redis)
+    )
+
+  app
+    .route('/allprogress/')
+    .get(
+      validateSentInteractionToken,
+      matchAgainstRequest(redis),
+      validateCredentialsAgainstRequest,
+      library.getAllProgress(redis)
+    )
 }
