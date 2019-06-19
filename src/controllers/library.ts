@@ -11,12 +11,16 @@ interface UserBook {
 
 const retrieveBook = async (did: string, redis: RedisApi) =>
   redis.getAsync(did).then(maybeBook => {
-    return JSON.parse(maybeBook) as LibraryBook
+    return maybeBook
+      ? JSON.parse(maybeBook) as LibraryBook
+      : undefined
   })
 
 const retrieveDID = async (isbn: number, redis: RedisApi) =>
   redis.getAsync(isbn.toString()).then(did => {
-    return did as string
+    return did
+      ? did as string
+      : undefined
   })
 
 const getUserBooks = async (
@@ -183,8 +187,10 @@ const setProgress = (redis: RedisApi) => async (
 
 const populateDB = (redis: RedisApi) => async (bookList: LibraryBook[]) => {
   bookList.forEach(async book => {
-    await redis.setAsync(book.did, JSON.stringify(book))
-    await redis.setAsync(book.ISBN.toString(), book.did)
+    if (!(await retrieveBook(book.did, redis) && await retrieveDID(book.ISBN, redis))) {
+      await redis.setAsync(book.did, JSON.stringify(book))
+      await redis.setAsync(book.ISBN.toString(), book.did)
+    }
   })
 }
 
