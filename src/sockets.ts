@@ -14,7 +14,7 @@ export enum SocketEvents {
 }
 
 export enum Endpoints {
-  authn = '/authenticate/',
+  authn = '/login',
   receive = '/receive/'
 }
 
