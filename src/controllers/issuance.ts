@@ -12,14 +12,20 @@ const generateCredentialOffer = (
   const { credentialType } = req.params
 
   try {
-    const {type: offeredType} = credentialOffers[credentialType]
+    const {
+      schema: { type: offeredType },
+      metadata = {}
+    } = credentialOffers[credentialType]
 
     const credOffer = await identityWallet.create.interactionTokens.request.offer(
       {
         callbackURL: `${serviceUrl}/receive/${credentialType}`,
-        offeredCredentials: [{
-          type: offeredType[offeredType.length -1]
-        }]
+        offeredCredentials: [
+          {
+            type: offeredType[offeredType.length - 1],
+            ...metadata
+          }
+        ]
       },
       password
     )
@@ -47,7 +53,7 @@ const consumeCredentialOfferResponse = (
 
   const credential = await identityWallet.create.signedCredential(
     {
-      metadata: credentialOffers[credentialType],
+      metadata: credentialOffers[credentialType].schema,
       claim,
       subject: keyIdToDid(credentialOfferResponse.issuer)
     },

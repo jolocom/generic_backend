@@ -3,12 +3,13 @@ import { password, seed, serviceUrl } from './config'
 import axios, { AxiosResponse } from 'axios'
 import { claimsMetadata } from 'cred-types-jolocom-demo'
 import { Endpoints } from './sockets'
-import { CredentialOffer } from 'jolocom-lib/js/interactionTokens/credentialOffer'
 import { JSONWebToken } from 'jolocom-lib/js/interactionTokens/JSONWebToken'
+import { CredentialOfferRequest } from 'jolocom-lib/js/interactionTokens/credentialOfferRequest'
+import { CredentialRequest } from 'jolocom-lib/js/interactionTokens/credentialRequest'
 
 const getIdentityWallet = async () => {
   const registry = JolocomLib.registries.jolocom.create()
-  const vaultedKeyProvider = new JolocomLib.KeyProvider(seed, password)
+  const vaultedKeyProvider = JolocomLib.KeyProvider.fromSeed(seed, password)
 
   return registry.authenticate(vaultedKeyProvider, {
     derivationPath: JolocomLib.KeyTypes.jolocomIdentityKey,
@@ -22,12 +23,20 @@ export const testCredentialReceive = async () => {
   const { token } = (await axios.get(
     `${serviceUrl}${Endpoints.receive}id-card`
   )).data
+
   const credentialOffer: JSONWebToken<
-    CredentialOffer
+    CredentialOfferRequest
   > = JolocomLib.parse.interactionToken.fromJWT(token)
 
   const offerResponse = await identityWallet.create.interactionTokens.response.offer(
-    credentialOffer.interactionToken.toJSON(),
+    {
+      callbackURL: credentialOffer.interactionToken.callbackURL,
+      selectedCredentials: [
+        {
+          type: credentialOffer.interactionToken.offeredTypes[0]
+        }
+      ]
+    },
     password,
     JolocomLib.parse.interactionToken.fromJWT(token)
   )
@@ -43,7 +52,9 @@ export const testCredentialOffer = async () => {
   const identityWallet = await getIdentityWallet()
 
   const { token } = (await axios.get(`${serviceUrl}${Endpoints.authn}`)).data
-  const credentialRequest = JolocomLib.parse.interactionToken.fromJWT(token)
+  const credentialRequest: JSONWebToken<
+    CredentialRequest
+  > = JolocomLib.parse.interactionToken.fromJWT(token)
 
   const cred = await identityWallet.create.signedCredential(
     {
