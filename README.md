@@ -1,2 +1,1 @@
-# generic_backend
-A generic backend implementation that makes use of the Jolocom Library for authentication, and for issuing credentials.
+Documentation for the generic backend is currently hosted [here](https://jolocom.slite.com/p/note/RGanceZUjeLQZqGxGrpStJ).
