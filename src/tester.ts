@@ -1,7 +1,7 @@
 import { JolocomLib } from 'jolocom-lib'
 import { password, seed, serviceUrl } from './config'
 import axios, { AxiosResponse } from 'axios'
-import { claimsMetadata } from 'cred-types-jolocom-demo'
+import { claimsMetadata } from 'cred-types-jolocom-core'
 import { Endpoints } from './sockets'
 import { JSONWebToken } from 'jolocom-lib/js/interactionTokens/JSONWebToken'
 import { CredentialOfferRequest } from 'jolocom-lib/js/interactionTokens/credentialOfferRequest'
@@ -17,38 +17,39 @@ const getIdentityWallet = async () => {
   })
 }
 
-export const testCredentialReceive = async () => {
-  const identityWallet = await getIdentityWallet()
+// Currently not usable.
+// export const testCredentialReceive = async () => {
+//   const identityWallet = await getIdentityWallet()
+// 
+//   const { token } = (await axios.get(
+//     `${serviceUrl}${Endpoints.receive}id-card`
+//   )).data
+// 
+//   const credentialOffer: JSONWebToken<
+//     CredentialOfferRequest
+//   > = JolocomLib.parse.interactionToken.fromJWT(token)
+// 
+//   const offerResponse = await identityWallet.create.interactionTokens.response.offer(
+//     {
+//       callbackURL: credentialOffer.interactionToken.callbackURL,
+//       selectedCredentials: [
+//         {
+//           type: credentialOffer.interactionToken.offeredTypes[0]
+//         }
+//       ]
+//     },
+//     password,
+//     JolocomLib.parse.interactionToken.fromJWT(token)
+//   )
+// 
+//   return axios
+//     .post(`${serviceUrl}${Endpoints.receive}id-card`, {
+//       token: offerResponse.encode()
+//     })
+//     .catch(err => console.log(err))
+// }
 
-  const { token } = (await axios.get(
-    `${serviceUrl}${Endpoints.receive}id-card`
-  )).data
-
-  const credentialOffer: JSONWebToken<
-    CredentialOfferRequest
-  > = JolocomLib.parse.interactionToken.fromJWT(token)
-
-  const offerResponse = await identityWallet.create.interactionTokens.response.offer(
-    {
-      callbackURL: credentialOffer.interactionToken.callbackURL,
-      selectedCredentials: [
-        {
-          type: credentialOffer.interactionToken.offeredTypes[0]
-        }
-      ]
-    },
-    password,
-    JolocomLib.parse.interactionToken.fromJWT(token)
-  )
-
-  return axios
-    .post(`${serviceUrl}${Endpoints.receive}id-card`, {
-      token: offerResponse.encode()
-    })
-    .catch(err => console.log(err))
-}
-
-export const testCredentialOffer = async () => {
+export const testCredentialRequest = async () => {
   const identityWallet = await getIdentityWallet()
 
   const { token } = (await axios.get(`${serviceUrl}${Endpoints.authn}`)).data
@@ -60,9 +61,9 @@ export const testCredentialOffer = async () => {
     {
       subject: identityWallet.did,
       claim: {
-        identifier: '0123451612'
+        email: 'test@jolocom.com'
       },
-      metadata: claimsMetadata.akaart
+      metadata: claimsMetadata.emailAddress
     },
     password
   )
@@ -84,6 +85,7 @@ export const testCredentialOffer = async () => {
 }
 
 // testCredentialReceive().then((res: AxiosResponse) => console.log(res.status))
-testCredentialOffer()
+
+testCredentialRequest()
   .then((res: AxiosResponse) => console.log(res.status))
   .catch(err => console.log(err))
