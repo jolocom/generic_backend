@@ -54,7 +54,7 @@ const consumeCredentialOfferResponse = (
   const credential = await identityWallet.create.signedCredential(
     {
       metadata: credentialOffers[credentialType].schema,
-      claim,
+      claim: { ...claim, message: 'Thank you for testing the endpoint' },
       subject: keyIdToDid(credentialOfferResponse.issuer)
     },
     password
