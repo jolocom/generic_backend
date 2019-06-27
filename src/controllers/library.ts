@@ -77,7 +77,9 @@ const rentBook = (redis: RedisApi) => async (
     if (book.available) {
       // set book unavailable
       book.available = false
-
+      // return book in 21 days
+      const newDate = new Date(date.setTime( date.getTime() + 21 * 86400000 ));
+      book.returnDate = newDate.toString()
       // add book to user table
       const userBooks = await getUserBooks(userDid, redis)
       await storeUserBooks(
@@ -112,6 +114,7 @@ const returnBook = (redis: RedisApi) => async (
       // set book available
       book.available = true
       book.reads = book.reads + 1
+      book.returnDate = ""
 
       // remove book from user table
       const userBooks = await getUserBooks(userDid, redis)
