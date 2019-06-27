@@ -140,7 +140,7 @@ const getProgress = (redis: RedisApi) => async (
 
     const userBooks = await getUserBooks(userDid, redis)
     const userBook = userBooks.filter(book => book.bookDid === bookDid)
-    res.send(userBook[0].progress)
+    res.send(userBook[0])
   } catch (err) {
     console.error(err)
     res.status(403).send('Book not rented to you')
