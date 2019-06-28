@@ -10,6 +10,7 @@ export const validateSentInteractionToken = async (
   next: NextFunction
 ) => {
     if (req.param("token") === "test") {
+        // @ts-ignore
         req.userResponseToken = {issuer: "did:jolo:12345"}
         next()
     } else {
@@ -35,7 +36,7 @@ export const matchAgainstRequest = (redis: RedisApi) => async (
   res: Response,
   next: NextFunction
 ) => {
-    if (req.userResponseToken.issuer === "test") {
+    if (req.userResponseToken.issuer === "did:jolo:12345") {
         next()
     } else {
   const sentRequestJWT = await redis.getAsync(req.userResponseToken.nonce)
@@ -63,7 +64,7 @@ export const validateCredentialsAgainstRequest = async (
   res: Response,
   next: NextFunction
 ) => {
-    if (req.userResponseToken.issuer === "test") {
+    if (req.userResponseToken.issuer === "did:jolo:12345") {
         next()
     } else {
   const response = req.userResponseToken.interactionToken as CredentialResponse
