@@ -9,13 +9,13 @@ export const validateSentInteractionToken = async (
   res: Response,
   next: NextFunction
 ) => {
-    if (req.body.token === "test") {
+    if (req.param("token") === "test") {
         req.userResponseToken = {issuer: "did:jolo:12345"}
         next()
     } else {
   try {
     const interactionToken = await JolocomLib.parse.interactionToken.fromJWT(
-      req.body.token
+        req.param("token")
     )
 
     if (!JolocomLib.util.validateDigestable(interactionToken)) {
@@ -35,7 +35,7 @@ export const matchAgainstRequest = (redis: RedisApi) => async (
   res: Response,
   next: NextFunction
 ) => {
-    if (req.body.token === "test") {
+    if (req.userResponseToken.issuer === "test") {
         next()
     } else {
   const sentRequestJWT = await redis.getAsync(req.userResponseToken.nonce)
@@ -63,7 +63,7 @@ export const validateCredentialsAgainstRequest = async (
   res: Response,
   next: NextFunction
 ) => {
-    if (req.body.token === "test") {
+    if (req.userResponseToken.issuer === "test") {
         next()
     } else {
   const response = req.userResponseToken.interactionToken as CredentialResponse
