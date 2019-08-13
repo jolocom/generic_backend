@@ -18,7 +18,7 @@ export const seed = Buffer.from(
 export const password = 'correct horse battery staple'
 
 /* Where is your service deployed. E.g. https://demo-sso.jolocom.com, used by the frontend */
-export const serviceUrl = 'https://ecebe401.ngrok.io'
+export const serviceUrl = 'https://23f0b8e4.ngrok.io'
 
 /* Credentials required during authentication */
 export const currentCredentialRequirements = ['email']
@@ -32,14 +32,24 @@ export const credentialRequirements = {
 
 /* Credentials offered by the service. Documentation on how to include custom credentials coming soon */
 export const credentialOffers = {
-  testerBadge: {
+  eid: {
     schema: {
-      type: ['Credential', 'TesterCredential'],
+      type: ['Credential', 'EidCredential'],
       context: [],
       claimInterface: {
-        message: ''
+        EidCredential: 'https://identity.jolocom.com/terms/EidCredential',
+        schema: 'https://schema.org/',
+        familyName: 'schema:familyName',
+        givenName: 'schema:givenName',
+        birthDate: 'schema:birthDate',
+        birthPlace: 'schema:birthPlace',
+        nationality: 'schema:nationality',
+        validThrough: 'schema:validThrough',
+        documentNumber: 'schema:identifier',
+        address: 'schema:streetAddress',
+        issuedBy: 'schema:issuedBy'
       },
-      name: 'Tester Badge'
+      name: 'Demo eID'
     },
     requestedInput: {}, // currently not used
     metadata: {
@@ -50,10 +60,10 @@ export const credentialOffers = {
         },
         background: {
           url:
-            'https://jolocom.io/wp-content/themes/jolocom/images/Solution-hero-mobile.jpg'
+            'https://i.imgur.com/0Mrldei.png'
         },
         text: {
-          color: '#ffffff'
+          color: '#05050d'
         },
         renderAs: CredentialRenderTypes.document
       },

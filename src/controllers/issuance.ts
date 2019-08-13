@@ -54,7 +54,18 @@ const consumeCredentialOfferResponse = (
   const credential = await identityWallet.create.signedCredential(
     {
       metadata: credentialOffers[credentialType].schema,
-      claim: { ...claim, message: 'Thank you for testing the endpoint' },
+      claim: {
+        ...claim,
+        familyName: 'Mark',
+        givenName: 'Musterman',
+        birthDate: '12.08.1864',
+        birthPlace: 'Berlin',
+        nationality: 'German',
+        validThrough: new Date(),
+        documentNumber: 938569,
+        address: 'Heiderstr. 17',
+        issuedBy: 'Jolocom Testing Service'
+      },
       subject: keyIdToDid(credentialOfferResponse.issuer)
     },
     password
