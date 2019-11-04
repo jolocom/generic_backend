@@ -34,12 +34,17 @@ export const credentialRequirements = {
 export const credentialOffers = {
   testerBadge: {
     schema: {
-      type: ['Credential', 'TesterCredential'],
-      context: [],
+      type: ['Credential', 'AccessKey'],
+      context: [
+          {
+              token: 'schema:ticketToken',
+              schema: 'https://schema.org/'
+          }
+      ],
       claimInterface: {
-        message: ''
+        token: ''
       },
-      name: 'Tester Badge'
+      name: 'Access Key'
     },
     requestedInput: {}, // currently not used
     metadata: {
