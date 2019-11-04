@@ -32,7 +32,7 @@ export const credentialRequirements = {
 
 /* Credentials offered by the service. Documentation on how to include custom credentials coming soon */
 export const credentialOffers = {
-  testerBadge: {
+  accessKey: {
     schema: {
       type: ['Credential', 'AccessKey'],
       context: [
