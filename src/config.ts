@@ -5,17 +5,18 @@ import {
   CredentialOfferRenderInfo,
   CredentialRenderTypes
 } from 'jolocom-lib/js/interactionTokens/interactionTokens.types'
+import { JolocomLib } from 'jolocom-lib'
 
 /**
  * The seed to instantiate a vaulted key provider and password for seed encryption / decryption
  * The need to persist the seed in clear text will be addressed in the next minor release
  */
 export const seed = Buffer.from(
-  'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-  'hex'
+ 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbccccccccccc',
+ 'hex'
 )
 
-export const password = 'correct horse battery staple'
+export const password = 'giraffe deploy browser table'
 
 /* Where is your service deployed. E.g. https://demo-sso.jolocom.com, used by the frontend */
 export const serviceUrl = 'https://ecebe401.ngrok.io'
