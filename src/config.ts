@@ -7,6 +7,8 @@ import {
 } from 'jolocom-lib/js/interactionTokens/interactionTokens.types'
 import { JolocomLib } from 'jolocom-lib'
 
+export { graphs } from './graphs'
+
 /**
  * The seed to instantiate a vaulted key provider and password for seed encryption / decryption
  * The need to persist the seed in clear text will be addressed in the next minor release
@@ -19,7 +21,7 @@ export const seed = Buffer.from(
 export const password = 'giraffe deploy browser table'
 
 /* Where is your service deployed. E.g. https://demo-sso.jolocom.com, used by the frontend */
-export const serviceUrl = 'https://ecebe401.ngrok.io'
+export const serviceUrl = 'https://8035286d.ngrok.io'
 
 /* Credentials required during authentication */
 export const currentCredentialRequirements = ['email']
@@ -77,3 +79,52 @@ export const credentialOffers = {
     }
   }
 }
+
+const createID = () => {
+    const registry = JolocomLib.registries.jolocom.create()
+    const vaultedKeyProvider = JolocomLib.KeyProvider.fromSeed(seed, password)
+
+    JolocomLib.util.fuelKeyWithEther(vaultedKeyProvider.getPublicKey({
+        derivationPath: JolocomLib.KeyTypes.ethereumKey,
+        encryptionPass: password
+    }))
+    // registry.create(vaultedKeyProvider, password)
+}
+// createID()
+
+const configurePublicProfile = (serviceName: string, desc: string) => {
+    const registry = JolocomLib.registries.jolocom.create()
+    const vaultedKeyProvider = JolocomLib.KeyProvider.fromSeed(seed, password)
+
+    registry
+        .authenticate(vaultedKeyProvider, {
+            derivationPath: JolocomLib.KeyTypes.jolocomIdentityKey,
+            encryptionPass: password
+        })
+        .then(async identityWallet => ({
+            idw: identityWallet,
+            cred: await identityWallet.create.signedCredential({
+                metadata: claimsMetadata.publicProfile,
+                claim: {
+                    name: serviceName,
+                    description: desc,
+                },
+                subject: identityWallet.did
+            }, password)
+
+        }))
+        .then(async ({idw, cred}) => {
+            idw.identity.publicProfile = cred
+            await registry.commit({
+                vaultedKeyProvider,
+                keyMetadata: {
+                    encryptionPass: password,
+                    derivationPath: JolocomLib.KeyTypes.ethereumKey
+                },
+                identityWallet: idw
+            })
+        })
+
+}
+
+configurePublicProfile('Company 1', 'We provide Access Management')
