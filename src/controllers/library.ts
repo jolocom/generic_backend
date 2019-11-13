@@ -77,7 +77,10 @@ const rentBook = (redis: RedisApi) => async (
     if (book.available) {
       // set book unavailable
       book.available = false
-
+      // return book in 21 days
+      const newDate = new Date();
+      newDate.setTime(newDate.getTime() + 21 * 86400000)
+      book.returnDate = newDate.toString()
       // add book to user table
       const userBooks = await getUserBooks(userDid, redis)
       await storeUserBooks(
@@ -112,6 +115,7 @@ const returnBook = (redis: RedisApi) => async (
       // set book available
       book.available = true
       book.reads = book.reads + 1
+      book.returnDate = ""
 
       // remove book from user table
       const userBooks = await getUserBooks(userDid, redis)
@@ -140,7 +144,7 @@ const getProgress = (redis: RedisApi) => async (
 
     const userBooks = await getUserBooks(userDid, redis)
     const userBook = userBooks.filter(book => book.bookDid === bookDid)
-    res.send(userBook[0].progress)
+    res.send(userBook[0])
   } catch (err) {
     console.error(err)
     res.status(403).send('Book not rented to you')

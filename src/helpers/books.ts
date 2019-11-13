@@ -34,6 +34,7 @@ export const setupLibrary = (
   booklist.map(book => ({
     ...book,
     available: true,
+    returnDate: "",
     did: isbnToDID(libIdw.did, password, book.ISBN),
     reads: 0,
     image: `https://papyri.jolocom.com/assets/covers/${book.ISBN}.png`

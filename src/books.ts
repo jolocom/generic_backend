@@ -13,6 +13,7 @@ export interface Book {
 
 export interface LibraryBook extends Book {
   available: boolean
+  returnDate: string
   did: string
   reads: number
   image: string

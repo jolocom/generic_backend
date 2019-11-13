@@ -1,0 +1,30 @@
+
+/rent/ & /return/ POST
+body: {
+  did: string
+  token: string
+} -> status code
+
+/progress/ GET
+body: {
+  did: string
+  token: string
+} -> {
+  did: string
+  progress: number
+}
+
+/progress/ POST
+body: {
+  did: string
+  progress: number
+  token: string
+} -> status code
+
+/allprogress/ GET
+body: {
+  token: string
+} -> {
+  did: string
+  progress: number
+}[]
