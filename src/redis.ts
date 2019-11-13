@@ -1,11 +1,14 @@
 import { promisify } from 'util'
 const redis = require('redis')
 
+const REDIS_HOST = process.env.REDIS_HOST || 'localhost'
+const REDIS_PORT = parseInt(process.env.REDIS_PORT || '6379')
+
 // TODO Get from redis config
 export const initializeRedisClient = () => {
   const client = redis.createClient({
-    host: 'localhost',
-    port: 6379
+    host: REDIS_HOST,
+    port: REDIS_PORT
   })
 
   client.on('error', (err: Error) => {
