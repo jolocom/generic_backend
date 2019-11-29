@@ -9,21 +9,21 @@ interface UserBook {
   progress: number
 }
 
-const retrieveBook = async (did: string, redis: RedisApi) =>
+export const retrieveBook = async (did: string, redis: RedisApi) =>
   redis.getAsync(did).then(maybeBook => {
     return maybeBook
       ? JSON.parse(maybeBook) as LibraryBook
       : undefined
   })
 
-const retrieveDID = async (isbn: number, redis: RedisApi) =>
+export const retrieveDID = async (isbn: number, redis: RedisApi) =>
   redis.getAsync(isbn.toString()).then(did => {
     return did
       ? did as string
       : undefined
   })
 
-const getUserBooks = async (
+export const getUserBooks = async (
   did: string,
   redis: RedisApi
 ): Promise<UserBook[]> =>
@@ -41,7 +41,7 @@ const getUserBooks = async (
       return []
     })
 
-const storeUserBooks = async (
+export const storeUserBooks = async (
   did: string,
   books: UserBook[],
   redis: RedisApi
