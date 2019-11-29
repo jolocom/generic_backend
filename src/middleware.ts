@@ -21,7 +21,6 @@ export const validateSentInteractionToken = async (
     const interactionToken = await JolocomLib.parse.interactionToken.fromJWT(
         token
     )
-    console.log(interactionToken.toJSON())
 
     if (!JolocomLib.util.validateDigestable(interactionToken)) {
       res.status(401).send('Invalid signature on interaction token')

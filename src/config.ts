@@ -10,6 +10,9 @@ config()
  * The seed to instantiate a vaulted key provider and password for seed encryption / decryption
  * The need to persist the seed in clear text will be addressed in the next minor release
  */
+
+export const keyToDid = (key: string) => key.slice(0, key.indexOf('#'))
+
 export const seed = Buffer.from(
     process.env.SEED,
     'hex'

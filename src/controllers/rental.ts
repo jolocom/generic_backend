@@ -4,7 +4,8 @@ import { IdentityWallet } from 'jolocom-lib/js/identityWallet/identityWallet'
 import { RedisApi, RequestWithInteractionTokens } from '../types'
 import {
   password,
-  serviceUrl
+    serviceUrl,
+    keyToDid
 } from '../config'
 import { bookToID } from '../helpers/books'
 import {
@@ -20,7 +21,6 @@ const generateRentalRequest = (
   req: Request,
   res: Response
 ) => {
-    console.log(req.params.did)
     const callbackURL = `${serviceUrl}/rent/`
     const book = await retrieveBook(req.params.did, redis)
 
@@ -48,8 +48,9 @@ const consumeRentalResponse = (redis: RedisApi) => async (
   res: Response
 ) => {
   const issuer = req.userResponseToken.audience
-  const user = req.userResponseToken.issuer
+  const userDid = keyToDid(req.userResponseToken.issuer)
 
+    console.log(req.userResponseToken)
   const book = await retrieveBook(issuer, redis)
 
   if (book.did !== issuer) {
@@ -65,9 +66,9 @@ const consumeRentalResponse = (redis: RedisApi) => async (
       newDate.setTime(newDate.getTime() + 21 * 86400000)
       book.returnDate = newDate.toString()
       // add book to user table
-      const userBooks = await getUserBooks(user, redis)
+      const userBooks = await getUserBooks(userDid, redis)
       await storeUserBooks(
-        user,
+        userDid,
         [...userBooks, { bookDid: issuer, progress: 0 }],
         redis
       )
