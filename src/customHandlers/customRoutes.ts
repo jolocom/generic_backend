@@ -10,6 +10,7 @@ import {
   validateSentInteractionToken
 } from './../middleware'
 import { registration } from './../controllers/registration'
+import { rental } from './../controllers/rental'
 import { uniqueBooks } from '../books'
 
 export const configureCustomRoutes = async (
@@ -35,6 +36,14 @@ export const configureCustomRoutes = async (
       matchAgainstRequest(redis),
       validateCredentialsAgainstRequest,
       library.rentBook(redis)
+    )
+
+  app
+    .route('/rentQR/')
+    .get(rental.generateRentalRequest(identityWallet, redis))
+    .post(
+      validateSentInteractionToken,
+      rental.consumeRentalResponse(redis)
     )
 
   app
