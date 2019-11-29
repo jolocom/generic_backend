@@ -4,6 +4,7 @@ import { IVaultedKeyProvider } from 'jolocom-lib/js/vaultedKeyProvider/types'
 import { IdentityWallet } from 'jolocom-lib/js/identityWallet/identityWallet'
 import * as hash from 'object-hash'
 import { Book, LibraryBook } from '../books'
+import { IRegistry } from 'jolocom-lib/js/registries/types';
 
 export const setupDID = async (
   kp: IVaultedKeyProvider,
@@ -27,37 +28,37 @@ export const setupDID = async (
 }
 
 export const bookToVKP = (
-    isbn: number,
-    libDid: string,
-    password: string,
-    occurance = 0
+  isbn: number,
+  libDid: string,
+  password: string,
+  occurance = 0
 ) => new JolocomLib.KeyProvider(
-    Buffer.from(
-      hash({
-        bookISBN: isbn,
-        libDID: libDid,
-        occurance
-      })
-    ),
-    password
-  )
+  Buffer.from(
+    hash({
+      bookISBN: isbn,
+      libDID: libDid,
+      occurance
+    })
+  ),
+  password
+)
 
 export const bookToID = (
-    libDid: string,
+  libDid: string,
 ) => async (
-    isbn: number,
-    password: string,
-    occurance = 0
+  isbn: number,
+  password: string,
+  occurance = 0
 ) => {
     const reg = JolocomLib.registries.jolocom.create()
 
     const vkp = bookToVKP(isbn, libDid, password, occurance)
 
     return await reg.authenticate(vkp, {
-        derivationPath: JolocomLib.KeyTypes.jolocomIdentityKey,
-        encryptionPass: password
+      derivationPath: JolocomLib.KeyTypes.jolocomIdentityKey,
+      encryptionPass: password
     })
-}
+  }
 
 export const setupLibrary = (
   libIdw: IdentityWallet,
@@ -88,3 +89,22 @@ export const isbnToDID = (
     })
   )
 }
+
+export const fuelBook = (
+  reg: IRegistry,
+  password: string
+) => async (
+  vkp: IVaultedKeyProvider
+) => JolocomLib.util.fuelKeyWithEther(
+  vkp.getPublicKey({
+    derivationPath: JolocomLib.KeyTypes.ethereumKey,
+    encryptionPass: password
+  })
+)
+
+export const registerBook = (
+  reg: IRegistry,
+  password: string
+) => async (
+  vkp: IVaultedKeyProvider
+) => reg.create(vkp, password)
