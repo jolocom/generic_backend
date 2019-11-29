@@ -22,8 +22,9 @@ const generateRentalRequest = (
   req: Request,
   res: Response
 ) => {
+    console.log(req.params.did)
     const callbackURL = `${papyri}${Endpoints.authn}`
-    const book = await retrieveBook(req.body.did, redis)
+    const book = await retrieveBook(req.params.did, redis)
 
     const description = `Rent ${book.title || 'this Book'}`
 
@@ -72,7 +73,7 @@ const consumeRentalResponse = (redis: RedisApi) => async (
         redis
       )
       await redis.setAsync(issuer, JSON.stringify(book))
-      res.sendStatus(200)
+      res.sendStatus(200).send(issuer)
     } else {
       res.status(403).send('Book Unavailable')
     }
