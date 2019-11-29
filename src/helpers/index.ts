@@ -27,8 +27,10 @@ export const generateRequirementsFromConfig = ({
     : []) as IConstraint[]
 })
 
-export const setStatusPending = (redis: RedisApi, key: string, data: any) =>
-  redis.setAsync(key, JSON.stringify({ ...data, status: 'pending' }), 60 * 60)
+export const setStatus = time => (redis: RedisApi, key: string, data: any) =>
+  redis.setAsync(key, JSON.stringify({ ...data, status: 'pending' }), time)
+
+export const setStatusPending = setStatus(60 * 60)
 
 export const setStatusDone = (redis: RedisApi, key: string, data: any = {}) =>
   redis.setAsync(key, JSON.stringify({ ...data, status: 'success' }), 60 * 60)
