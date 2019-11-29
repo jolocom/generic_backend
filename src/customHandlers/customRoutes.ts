@@ -41,6 +41,9 @@ export const configureCustomRoutes = async (
   app
     .route('/rentQR/:did')
     .get(rental.generateRentalRequest(identityWallet, redis))
+
+  app
+    .route('/rentBook/')
     .post(
       validateSentInteractionToken,
       rental.consumeRentalResponse(redis)

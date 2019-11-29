@@ -4,16 +4,14 @@ import { IdentityWallet } from 'jolocom-lib/js/identityWallet/identityWallet'
 import { RedisApi, RequestWithInteractionTokens } from '../types'
 import {
   password,
+  serviceUrl
 } from '../config'
 import { bookToID } from '../helpers/books'
-import { Endpoints } from '../sockets'
 import {
   retrieveBook,
   getUserBooks,
   storeUserBooks
 } from './library'
-
-const papyri = "papyri://"
 
 const generateRentalRequest = (
   identityWallet: IdentityWallet,
@@ -23,7 +21,7 @@ const generateRentalRequest = (
   res: Response
 ) => {
     console.log(req.params.did)
-    const callbackURL = `${papyri}${Endpoints.authn}`
+    const callbackURL = `${serviceUrl}/rent/`
     const book = await retrieveBook(req.params.did, redis)
 
     const description = `Rent ${book.title || 'this Book'}`
@@ -49,8 +47,9 @@ const consumeRentalResponse = (redis: RedisApi) => async (
   req: RequestWithInteractionTokens,
   res: Response
 ) => {
-  const { issuer } = req.serviceRequestToken
+  const issuer = req.userResponseToken.audience
   const user = req.userResponseToken.issuer
+
   const book = await retrieveBook(issuer, redis)
 
   if (book.did !== issuer) {
@@ -73,7 +72,7 @@ const consumeRentalResponse = (redis: RedisApi) => async (
         redis
       )
       await redis.setAsync(issuer, JSON.stringify(book))
-      res.sendStatus(200).send(issuer)
+      res.status(200).send(issuer)
     } else {
       res.status(403).send('Book Unavailable')
     }

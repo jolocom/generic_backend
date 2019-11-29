@@ -9,15 +9,19 @@ export const validateSentInteractionToken = async (
   res: Response,
   next: NextFunction
 ) => {
-    if (req.param("token") === "test") {
+    // @ts-ignore
+    const token = req.param.token || req.body.token
+
+    if (token === "test") {
         // @ts-ignore
         req.userResponseToken = {issuer: "did:jolo:12345"}
         next()
     } else {
   try {
     const interactionToken = await JolocomLib.parse.interactionToken.fromJWT(
-        req.param("token")
+        token
     )
+    console.log(interactionToken.toJSON())
 
     if (!JolocomLib.util.validateDigestable(interactionToken)) {
       res.status(401).send('Invalid signature on interaction token')
