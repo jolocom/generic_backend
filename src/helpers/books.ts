@@ -26,6 +26,39 @@ export const setupDID = async (
   }
 }
 
+export const bookToVKP = (
+    isbn: number,
+    libDid: string,
+    password: string,
+    occurance = 0
+) => new JolocomLib.KeyProvider(
+    Buffer.from(
+      hash({
+        bookISBN: isbn,
+        libDID: libDid,
+        occurance
+      })
+    ),
+    password
+  )
+
+export const bookToID = (
+    libDid: string,
+) => async (
+    isbn: number,
+    password: string,
+    occurance = 0
+) => {
+    const reg = JolocomLib.registries.jolocom.create()
+
+    const vkp = bookToVKP(isbn, libDid, password, occurance)
+
+    return await reg.authenticate(vkp, {
+        derivationPath: JolocomLib.KeyTypes.jolocomIdentityKey,
+        encryptionPass: password
+    })
+}
+
 export const setupLibrary = (
   libIdw: IdentityWallet,
   password: string,
@@ -46,16 +79,7 @@ export const isbnToDID = (
   isbn: number,
   occurance = 0
 ): string => {
-  const vkp = new JolocomLib.KeyProvider(
-    Buffer.from(
-      hash({
-        bookISBN: isbn,
-        libDID: libDid,
-        occurance
-      })
-    ),
-    password
-  )
+  const vkp = bookToVKP(isbn, libDid, password, occurance)
 
   return publicKeyToDID(
     vkp.getPublicKey({
