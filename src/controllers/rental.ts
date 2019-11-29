@@ -50,7 +50,6 @@ const consumeRentalResponse = (redis: RedisApi) => async (
   const issuer = req.userResponseToken.audience
   const userDid = keyToDid(req.userResponseToken.issuer)
 
-    console.log(req.userResponseToken)
   const book = await retrieveBook(issuer, redis)
 
   if (book.did !== issuer) {
