@@ -18,7 +18,7 @@ export const seed = Buffer.from(
 export const password = 'correct horse battery staple'
 
 /* Where is your service deployed. E.g. https://demo-sso.jolocom.com, used by the frontend */
-export const serviceUrl = 'https://ecebe401.ngrok.io'
+export const serviceUrl = process.env.SERVICE_URL || 'http://localhost:9000'
 
 /* Credentials required during authentication */
 export const currentCredentialRequirements = ['email']
