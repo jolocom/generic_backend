@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events'
 
 export class DbWatcher extends EventEmitter {
-  private watchedKeys: string[] = []
+  private watchedKeys: Set<string> = new Set()
   private readonly interval = 2000
   private readonly getAsync: (key: string) => string
 
@@ -12,19 +12,16 @@ export class DbWatcher extends EventEmitter {
   }
 
   async checkSubscriptions() {
-    for (const watchedKey of this.watchedKeys) {
+    this.watchedKeys.forEach(async (watchedKey) => {
       const data = JSON.parse(await this.getAsync(watchedKey))
+      const isSuccess = data && data.status === 'success'
 
-      if (data && data.status === 'success') {
-        this.emit(watchedKey)
-        this.watchedKeys = this.watchedKeys.filter(key => key !== watchedKey)
-      }
-    }
+      if (isSuccess) this.emit(watchedKey)
+      if (!data || isSuccess) this.watchedKeys.delete(watchedKey)
+    })
   }
 
   addSubscription(userId: string) {
-    if (this.watchedKeys.indexOf(userId) < 0) {
-      this.watchedKeys.push(userId)
-    }
+    this.watchedKeys.add(userId)
   }
 }
