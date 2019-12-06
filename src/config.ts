@@ -28,7 +28,12 @@ export const currentCredentialRequirements = ['email']
 export const credentialRequirements = {
   email: {
     metadata: claimsMetadata.emailAddress,
-    credentialValidator: validateEmailCredential(['@jolocom.com'])
+    // example email validation with specific domains
+    // credentialValidator: validateEmailCredential(['@jolocom.com', '@jolocom.io']),
+    // or with specific emails
+    // credentialValidator: validateEmailCredential(['dev@jolocom.com'])
+    // or just any valid email
+    credentialValidator: validateEmailCredential()
   }
 } as { [key: string]: ICredentialReqSection }
 
