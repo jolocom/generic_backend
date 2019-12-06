@@ -5,6 +5,7 @@ import {
   CredentialOfferRenderInfo,
   CredentialRenderTypes
 } from 'jolocom-lib/js/interactionTokens/interactionTokens.types'
+import { validateEmailCredential } from './helpers/validators';
 
 /**
  * The seed to instantiate a vaulted key provider and password for seed encryption / decryption
@@ -26,7 +27,8 @@ export const currentCredentialRequirements = ['email']
 /* Credentials offered to users */
 export const credentialRequirements = {
   email: {
-    metadata: claimsMetadata.emailAddress
+    metadata: claimsMetadata.emailAddress,
+    credentialValidator: validateEmailCredential(['@jolocom.com'])
   }
 } as { [key: string]: ICredentialReqSection }
 
