@@ -12,7 +12,7 @@ RUN yarn install
 # Copy all other source code to work directory
 ADD . /usr/src/app
 
-EXPOSE 8000
+EXPOSE 9000
 
 # need to build at runtime because config.ts might be replaced/mounted
 CMD yarn build && yarn server
