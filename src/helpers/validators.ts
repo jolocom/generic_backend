@@ -15,18 +15,22 @@ export const applyValidationFunction = (credential: SignedCredential) => {
   return credentialValidator(credential)
 }
 
-export const validateEmailCredential = (whitelistedValues: string[]) => ({
+export const validateEmailCredential = (whitelistedValues?: string[]) => ({
   claim
 }: {
   claim: { [key: string]: string }
-}) =>
-  whitelistedValues.some(allowed =>
-    validateEmail(claim.email) && (
+}) => {
+  if (!validateEmail(claim.email)) return false
+  if (whitelistedValues) {
+    return whitelistedValues.some(allowed =>
       allowed.startsWith('@')
         ? claim.email.endsWith(allowed)
         : whitelistedValues.includes(claim.email)
     )
-  )
+  } else {
+    return true
+  }
+}
 
 export const areArraysEqual = (first: string[], second: string[]) => {
   if (first.length !== second.length) {
