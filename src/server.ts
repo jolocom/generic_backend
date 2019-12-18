@@ -27,3 +27,8 @@ registry
     configureSockets(server, redis, dbWatcher)
     server.listen(9000)
   })
+  .catch(err => {
+    console.error(err)
+    console.trace()
+    process.exit(1)
+  })
