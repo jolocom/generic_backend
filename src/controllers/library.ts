@@ -11,16 +11,12 @@ interface UserBook {
 
 export const retrieveBook = async (did: string, redis: RedisApi) =>
   redis.getAsync(did).then(maybeBook => {
-    return maybeBook
-      ? JSON.parse(maybeBook) as LibraryBook
-      : undefined
+    return maybeBook ? (JSON.parse(maybeBook) as LibraryBook) : undefined
   })
 
 export const retrieveDID = async (isbn: number, redis: RedisApi) =>
   redis.getAsync(isbn.toString()).then(did => {
-    return did
-      ? did as string
-      : undefined
+    return did ? (did as string) : undefined
   })
 
 export const getUserBooks = async (
@@ -70,7 +66,7 @@ const rentBook = (redis: RedisApi) => async (
   next: NextFunction
 ) => {
   try {
-    const bookDid = req.body.did
+    const bookDid = req.userResponseToken.audience
     const userDid = req.userResponseToken.issuer
     // is book rented?
     const book = await retrieveBook(bookDid, redis)
@@ -78,7 +74,7 @@ const rentBook = (redis: RedisApi) => async (
       // set book unavailable
       book.available = false
       // return book in 21 days
-      const newDate = new Date();
+      const newDate = new Date()
       newDate.setTime(newDate.getTime() + 21 * 86400000)
       book.returnDate = newDate.toString()
       // add book to user table
@@ -115,7 +111,7 @@ const returnBook = (redis: RedisApi) => async (
       // set book available
       book.available = true
       book.reads = book.reads + 1
-      book.returnDate = ""
+      book.returnDate = ''
 
       // remove book from user table
       const userBooks = await getUserBooks(userDid, redis)
@@ -191,7 +187,12 @@ const setProgress = (redis: RedisApi) => async (
 
 const populateDB = (redis: RedisApi) => async (bookList: LibraryBook[]) => {
   bookList.forEach(async book => {
-    if (!(await retrieveBook(book.did, redis) && await retrieveDID(book.ISBN, redis))) {
+    if (
+      !(
+        (await retrieveBook(book.did, redis)) &&
+        (await retrieveDID(book.ISBN, redis))
+      )
+    ) {
       await redis.setAsync(book.did, JSON.stringify(book))
       await redis.setAsync(book.ISBN.toString(), book.did)
     }

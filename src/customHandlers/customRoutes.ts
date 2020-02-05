@@ -29,14 +29,12 @@ export const configureCustomRoutes = async (
 
   app.route('/book/:did').get(library.getBookDetails(redis))
 
-  app
-    .route('/rent/')
-    .post(
-      validateSentInteractionToken,
-      matchAgainstRequest(redis),
-      validateCredentialsAgainstRequest,
-      library.rentBook(redis)
-    )
+  app.route('/rent/').post(
+    validateSentInteractionToken,
+    // matchAgainstRequest(redis),
+    // validateCredentialsAgainstRequest,
+    library.rentBook(redis)
+  )
 
   app
     .route('/rentQR/:did')
@@ -44,10 +42,7 @@ export const configureCustomRoutes = async (
 
   app
     .route('/rentBook/')
-    .post(
-      validateSentInteractionToken,
-      rental.consumeRentalResponse(redis)
-    )
+    .post(validateSentInteractionToken, rental.consumeRentalResponse(redis))
 
   app
     .route('/return/')
