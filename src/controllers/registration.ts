@@ -42,10 +42,8 @@ const generateCredentialShareRequest = (
     },
     password
   )
-  console.log(credentialRequest)
   const token = credentialRequest.encode()
   await setStatusPending(redis, credentialRequest.nonce, { request: token })
-  console.log(token)
   res.send({ token, identifier: credentialRequest.nonce })
 }
 
