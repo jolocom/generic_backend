@@ -53,7 +53,7 @@ const consumeCredentialOfferResponse = (
 
   const credential = await identityWallet.create.signedCredential(
     {
-      metadata: credentialOffers[credentialType],
+      metadata: credentialOffers[credentialType].schema,
       claim,
       subject: keyIdToDid(credentialOfferResponse.issuer)
     },
