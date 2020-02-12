@@ -568,6 +568,11 @@
   version "11.9.5"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-11.9.5.tgz#011eece9d3f839a806b63973e228f85967b79ed3"
 
+"@types/node@11.11.6":
+  version "11.11.6"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-11.11.6.tgz#df929d1bb2eee5afdda598a41930fe50b43eaa6a"
+  integrity sha512-Exw4yUWMBXM3X+8oqzJNRqZSwUAaS4+7NdvHqQuFi/d+synz++xmX3QIf+BFqneW8N31R8Ky+sikfZUXq07ggQ==
+
 "@types/node@^10.3.2":
   version "10.14.6"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.14.6.tgz#9cbfcb62c50947217f4d88d4d274cc40c22625a9"
@@ -856,6 +861,16 @@ bip39@^2.2.0:
     randombytes "^2.0.1"
     safe-buffer "^5.0.1"
     unorm "^1.3.3"
+
+bip39@^3.0.1:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/bip39/-/bip39-3.0.2.tgz#2baf42ff3071fc9ddd5103de92e8f80d9257ee32"
+  integrity sha512-J4E1r2N0tUylTKt07ibXvhpT2c5pyAFgvuA5q1H9uDy6dEGpjV8jmymh3MTYJDLCNbIVClSB9FbND49I6N24MQ==
+  dependencies:
+    "@types/node" "11.11.6"
+    create-hash "^1.1.0"
+    pbkdf2 "^3.0.9"
+    randombytes "^2.0.1"
 
 bip66@^1.1.3:
   version "1.1.5"
@@ -1279,6 +1294,11 @@ create-hmac@^1.1.0, create-hmac@^1.1.2, create-hmac@^1.1.4, create-hmac@^1.1.7:
 cred-types-jolocom-core@^0.0.10:
   version "0.0.10"
   resolved "https://registry.yarnpkg.com/cred-types-jolocom-core/-/cred-types-jolocom-core-0.0.10.tgz#69dabc0fdb41a795fa6d63230d44a82d98e55dba"
+
+cred-types-jolocom-core@^0.0.11:
+  version "0.0.11"
+  resolved "https://registry.yarnpkg.com/cred-types-jolocom-core/-/cred-types-jolocom-core-0.0.11.tgz#7cc8c23e511590fede0f9a072854f3892127e0ed"
+  integrity sha512-jnLdSo45XvMhPmecAve41GhYPRUqTIumCyjBa4rpUsTCsLSKR1LHq6XC0C9B0RKyk4S7/DZHjGc9q/WdkjVNCg==
 
 cred-types-jolocom-demo@^0.2.1:
   version "0.2.1"
@@ -2404,16 +2424,17 @@ isurl@^1.0.0-alpha5:
     has-to-string-tag-x "^1.2.0"
     is-object "^1.0.1"
 
-jolocom-lib@^2.4.3:
-  version "2.4.3"
-  resolved "https://registry.yarnpkg.com/jolocom-lib/-/jolocom-lib-2.4.3.tgz#8c29f6da1b3400786da9d9ed3b01d8708390aa59"
-  integrity sha512-ZeGBFSk/pCz+dS7ObB/WXrB8r0ZExVwbjwkdUNbBmMEf3vnXBs3ihCq1v8qCMzBGVDAABuZMq4+Qoek4G6V1GA==
+jolocom-lib@3:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/jolocom-lib/-/jolocom-lib-3.0.1.tgz#4b6d26ff440f6b54001c5fb15ee1f57df0a2ab9c"
+  integrity sha512-sCZvrc35cf81Lu3dTxKxo36+SuqzEkwVk4jywnYdPd+WVnVk1Eb3KdxBoeR+ypE2Yzx8JQwQp1HYaYXu00/caQ==
   dependencies:
     base64url "^3.0.1"
     bip32 "^1.0.2"
+    bip39 "^3.0.1"
     class-transformer "^0.1.10"
     create-hash "^1.2.0"
-    cred-types-jolocom-core "^0.0.10"
+    cred-types-jolocom-core "^0.0.11"
     detect-node "^2.0.4"
     ethereumjs-tx "^1.3.7"
     ethereumjs-util "^6.1.0"

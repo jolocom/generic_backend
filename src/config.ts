@@ -1,8 +1,11 @@
-import { BaseMetadata,
-         claimsMetadata} from 'cred-types-jolocom-core'
+import { BaseMetadata, claimsMetadata } from 'cred-types-jolocom-core'
 import { ICredentialReqSection } from './types'
 import { config } from 'dotenv'
-import { validateEmailCredential } from './helpers/validators';
+import { validateEmailCredential } from './helpers/validators'
+import {
+  CredentialOfferRenderInfo,
+  CredentialOfferMetadata
+} from 'jolocom-lib/js/interactionTokens/interactionTokens.types'
 
 config()
 
@@ -13,10 +16,7 @@ config()
 
 export const keyToDid = (key: string) => key.slice(0, key.indexOf('#'))
 
-export const seed = Buffer.from(
-    process.env.SEED,
-    'hex'
-)
+export const seed = Buffer.from(process.env.SEED, 'hex')
 
 export const password = process.env.PASSWORD
 
@@ -31,14 +31,22 @@ export const currentCredentialRequirements = ['e-mail']
 
 /* Credentials offered to users */
 export const credentialRequirements = {
-    'e-mail': {
-        metadata: claimsMetadata.emailAddress,
-        credentialValidator: validateEmailCredential(['@jolocom.com'])
-    }
+  'e-mail': {
+    metadata: claimsMetadata.emailAddress,
+    credentialValidator: validateEmailCredential(['@jolocom.com'])
+  }
 } as { [key: string]: ICredentialReqSection }
 
 /* Credentials offered by the service. Documentation on how to include custom credentials coming soon */
-export const credentialOffers = {} as { [key: string]: BaseMetadata }
+export const credentialOffers = {} as {
+  [key: string]: {
+    schema: BaseMetadata
+    metadata: {
+      renderInfo?: CredentialOfferRenderInfo
+      metadata?: CredentialOfferMetadata
+    }
+  }
+}
 
 export const bookList = [
   9781623170745,
