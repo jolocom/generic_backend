@@ -10,9 +10,8 @@ export const validateSentInteractionToken = async (
   next: NextFunction
 ) => {
   // @ts-ignore
-  const token = req.param.token || req.body.token
+  const token = req.param('token') || req.body.token
   console.log(req.url)
-  console.log(req.param || req.body)
   if (token === 'test') {
     // @ts-ignore
     req.userResponseToken = { issuer: 'did:jolo:12345' }
