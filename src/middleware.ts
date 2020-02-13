@@ -18,16 +18,18 @@ export const validateSentInteractionToken = async (
     next()
   } else {
     try {
+      console.log(token)
       const interactionToken = await JolocomLib.parse.interactionToken.fromJWT(
         token
       )
+      console.log(interactionToken.toJSON())
 
       if (!JolocomLib.util.validateDigestable(interactionToken)) {
         res.status(401).send('Invalid signature on interaction token')
       }
 
       req.userResponseToken = interactionToken
-      console.log('rent req')
+      console.log('validated')
       next()
     } catch (err) {
       res.status(401).send(`Could not parse interaction token - ${err.message}`)
