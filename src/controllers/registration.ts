@@ -22,7 +22,7 @@ const generateCredentialShareRequest = (
   identityWallet: IdentityWallet,
   redis: RedisApi
 ) => async (req: RequestWithInteractionTokens, res: Response) => {
-  const callbackURL = `${serviceUrl}${Endpoints.authn}`
+  const callbackURL = `${serviceUrl}${Endpoints.share}`
 
   const credentialRequest = await identityWallet.create.interactionTokens.request.share(
     {

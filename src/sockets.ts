@@ -14,6 +14,7 @@ export enum SocketEvents {
 }
 
 export enum Endpoints {
+  share = '/share/',
   authn = '/authenticate/',
   receive = '/receive/'
 }
@@ -24,12 +25,12 @@ export const configureSockets = (
   dbWatcher: DbWatcher
 ) => {
   const baseSocket = io(server)
-  const authnSocket = baseSocket.of(Endpoints.authn)
+  const shareSocket = baseSocket.of(Endpoints.share)
   const receiveCredSocket = baseSocket.of(Endpoints.receive)
 
-  authnSocket.on(
+  shareSocket.on(
     SocketEvents.connection,
-    authSocketConnectionHandler(dbWatcher, redis)
+    shareSocketConnectionHandler(dbWatcher, redis)
   )
   receiveCredSocket.on(
     SocketEvents.connection,
@@ -51,11 +52,11 @@ const credOfferSocketConnectionHandler = (
   watchDbForUpdate(identifier, dbWatcher, redis, socket)
 }
 
-const authSocketConnectionHandler = (
+const shareSocketConnectionHandler = (
   dbWatcher: DbWatcher,
   redis: RedisApi
 ) => async (socket: Socket) => {
-  const { identifier, qrCode } = await getQrEncodedToken(Endpoints.authn)
+  const { identifier, qrCode } = await getQrEncodedToken(Endpoints.share)
   socket.emit(SocketEvents.qrCode, { qrCode, identifier })
   watchDbForUpdate(identifier, dbWatcher, redis, socket)
 }
