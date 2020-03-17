@@ -17,7 +17,7 @@ export const configureDefaultRoutes = (
   identityWallet: IdentityWallet
 ) => {
   app
-    .route(Endpoints.authn)
+    .route(Endpoints.share)
     .get(registration.generateCredentialShareRequest(identityWallet, redis))
     .post(
       validateSentInteractionToken,

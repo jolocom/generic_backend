@@ -1,4 +1,4 @@
-import { Response } from 'express'
+import { Response, Request } from 'express'
 import { IdentityWallet } from 'jolocom-lib/js/identityWallet/identityWallet'
 
 import { RedisApi, RequestWithInteractionTokens } from '../types'
@@ -21,13 +21,25 @@ import { applyValidationFunction } from '../helpers/validators'
 const generateCredentialShareRequest = (
   identityWallet: IdentityWallet,
   redis: RedisApi
-) => async (req: RequestWithInteractionTokens, res: Response) => {
+) => async (req: Request, res: Response) => {
+  // NOTE Credential requirement types provided by the frontend
+  // e.g. demo.sso/share?types=id,name,
+
+  const queryTypes: string[] = req.query.types.split(',')
   const callbackURL = `${serviceUrl}${Endpoints.share}`
+
+  if (
+    !queryTypes.every(type =>
+      Object.keys(credentialRequirements).includes(type)
+    )
+  ) {
+    res.status(500).send({ error: 'Credential Type not found' })
+  }
 
   const credentialRequest = await identityWallet.create.interactionTokens.request.share(
     {
       callbackURL,
-      credentialRequirements: currentCredentialRequirements.reduce(
+      credentialRequirements: queryTypes.reduce(
         (acc, credentialType) =>
           credentialRequirements[credentialType]
             ? [
@@ -45,7 +57,6 @@ const generateCredentialShareRequest = (
 
   const token = credentialRequest.encode()
   await setStatusPending(redis, credentialRequest.nonce, { request: token })
-  console.log(token)
   res.send({ token, identifier: credentialRequest.nonce })
 }
 

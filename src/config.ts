@@ -5,7 +5,7 @@ import {
   CredentialOfferRenderInfo,
   CredentialRenderTypes
 } from 'jolocom-lib/js/interactionTokens/interactionTokens.types'
-import { validateEmailCredential } from './helpers/validators';
+import { validateEmailCredential } from './helpers/validators'
 
 /**
  * The seed to instantiate a vaulted key provider and password for seed encryption / decryption
@@ -24,6 +24,7 @@ export const serviceUrl = process.env.SERVICE_URL || 'http://localhost:9000'
 /* Credentials required during authentication */
 export const currentCredentialRequirements = ['email']
 
+// TODO @clauxx is this a typo? (credentials requested from the users)
 /* Credentials offered to users */
 export const credentialRequirements = {
   email: {
@@ -66,7 +67,7 @@ export const credentialOffers = {
       },
       metadata: {
         asynchronous: false // currently not used
-      },
+      }
     }
   }
 } as {
