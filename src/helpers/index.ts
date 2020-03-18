@@ -47,3 +47,6 @@ export const getDataFromUiForms = async (redis: RedisApi, key: string) => {
 
   return data ? JSON.parse(data) : {}
 }
+
+export const areTypesAvailable = (types: string[], source: object) =>
+  types.every(type => Object.keys(source).includes(type))

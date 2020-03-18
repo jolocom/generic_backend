@@ -28,7 +28,7 @@ export const configureDefaultRoutes = (
     )
 
   app
-    .route(`${Endpoints.receive}:credentialType`)
+    .route(Endpoints.receive)
     .get(issuance.generateCredentialOffer(identityWallet, redis))
     .post(
       validateSentInteractionToken,

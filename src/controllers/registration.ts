@@ -12,7 +12,8 @@ import {
   extractDataFromClaims,
   generateRequirementsFromConfig,
   setStatusDone,
-  setStatusPending
+  setStatusPending,
+  areTypesAvailable
 } from '../helpers/'
 import { CredentialResponse } from 'jolocom-lib/js/interactionTokens/credentialResponse'
 import { Endpoints } from '../sockets'
@@ -28,12 +29,8 @@ const generateCredentialShareRequest = (
   const queryTypes: string[] = req.query.types.split(',')
   const callbackURL = `${serviceUrl}${Endpoints.share}`
 
-  if (
-    !queryTypes.every(type =>
-      Object.keys(credentialRequirements).includes(type)
-    )
-  ) {
-    res.status(500).send({ error: 'Credential Type not found' })
+  if (areTypesAvailable(queryTypes, credentialRequirements)) {
+    return res.status(500).send({ error: 'Credential Type not found' })
   }
 
   const credentialRequest = await identityWallet.create.interactionTokens.request.share(
@@ -57,7 +54,7 @@ const generateCredentialShareRequest = (
 
   const token = credentialRequest.encode()
   await setStatusPending(redis, credentialRequest.nonce, { request: token })
-  res.send({ token, identifier: credentialRequest.nonce })
+  return res.send({ token, identifier: credentialRequest.nonce })
 }
 
 const consumeCredentialShareResponse = (redis: RedisApi) => async (
