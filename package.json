@@ -5,7 +5,7 @@
   "scripts": {
     "build": "tsc -p ./tsconfig.json",
     "clean": "rm -rf ./build",
-    "start": "yarn run redis:start; yarn run server; yarn run redis:stop",
+    "start": "yarn run redis:start; ts-node-dev --respawn --transpileOnly src/server.ts; yarn run redis:stop",
     "server": "node ./build/server.js",
     "redis:start": "redis-server &",
     "redis:stop": "redis-cli SHUTDOWN"
@@ -34,6 +34,7 @@
     "@types/redis": "^2.8.6",
     "@types/socket.io": "^2.1.2",
     "prettier": "^1.15.3",
+    "ts-node-dev": "^1.0.0-pre.44",
     "typescript": "^3.0.1"
   }
 }
