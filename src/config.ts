@@ -21,23 +21,6 @@ export const password = 'correct horse battery staple'
 /* Where is your service deployed. E.g. https://demo-sso.jolocom.com, used by the frontend */
 export const serviceUrl = process.env.SERVICE_URL || 'http://192.168.0.2:9000'
 
-/* Credentials required during authentication */
-export const currentCredentialRequirements = ['email']
-
-// TODO @clauxx is this a typo? (credentials requested from the users)
-/* Credentials offered to users */
-export const credentialRequirements = {
-  email: {
-    metadata: claimsMetadata.emailAddress,
-    // example email validation with specific domains
-    // credentialValidator: validateEmailCredential(['@jolocom.com', '@jolocom.io']),
-    // or with specific emails
-    // credentialValidator: validateEmailCredential(['dev@jolocom.com'])
-    // or just any valid email
-    credentialValidator: validateEmailCredential()
-  }
-} as { [key: string]: ICredentialReqSection }
-
 const genericRenderInfo = {
   logo: {
     url: 'https://miro.medium.com/fit/c/240/240/1*jbb5WdcAvaY1uVdCjX1XVg.png'
@@ -132,3 +115,35 @@ export const credentialOffers = {
     }
   }
 }
+
+/* Credentials required during authentication */
+// export const currentCredentialRequirements = ['email', 'SecondCredential']
+
+// TODO @clauxx is this a typo? (credentials requested from the users)
+/* Credentials offered to users */
+export const credentialRequirements = {
+  email: {
+    metadata: claimsMetadata.emailAddress,
+    // example email validation with specific domains
+    // credentialValidator: validateEmailCredential(['@jolocom.com', '@jolocom.io']),
+    // or with specific emails
+    // credentialValidator: validateEmailCredential(['dev@jolocom.com'])
+    // or just any valid email
+    credentialValidator: validateEmailCredential()
+  },
+  FirstCredential: {
+    metadata: {
+      ...credentialOffers.FirstCredential.schema
+    }
+  },
+  SecondCredential: {
+    metadata: {
+      ...credentialOffers.SecondCredential.schema
+    }
+  },
+  ThirdCredential: {
+    metadata: {
+      ...credentialOffers.ThirdCredential.schema
+    }
+  }
+} as { [key: string]: ICredentialReqSection }
