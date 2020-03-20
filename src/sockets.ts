@@ -7,6 +7,7 @@ import { RedisApi } from './types'
 import axios from 'axios'
 import { Socket } from 'socket.io'
 import { setDataFromUiForms } from './helpers'
+import { Socket } from 'dgram'
 
 export enum SocketEvents {
   qrCode = 'qrCode',
@@ -15,7 +16,7 @@ export enum SocketEvents {
 
 export enum Endpoints {
   share = '/share/',
-  authn = '/authenticate/',
+  auth = '/auth/',
   receive = '/receive/'
 }
 
@@ -27,6 +28,7 @@ export const configureSockets = (
   const baseSocket = io(server)
   const shareSocket = baseSocket.of(Endpoints.share)
   const receiveCredSocket = baseSocket.of(Endpoints.receive)
+  const authSocket = baseSocket.of(Endpoints.auth)
 
   shareSocket.on(
     SocketEvents.connection,
@@ -36,6 +38,16 @@ export const configureSockets = (
     SocketEvents.connection,
     credOfferSocketConnectionHandler(dbWatcher, redis)
   )
+  authSocket.on(SocketEvents.connection, authSocketConnectionHandler)
+}
+
+const authSocketConnectionHandler = (
+  dbWatcher: DbWatcher,
+  redis: RedisApi
+) => async (socket: Socket) => {
+  const { identifier, qrCode } = await getQrEncodedToken(Endpoints.auth)
+  socket.emit(SocketEvents.qrCode, { qrCode, identifier })
+  watchDbForUpdate(identifier, dbWatcher, redis, socket)
 }
 
 const credOfferSocketConnectionHandler = (
