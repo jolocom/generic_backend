@@ -2,12 +2,7 @@ import { Response, Request } from 'express'
 import { IdentityWallet } from 'jolocom-lib/js/identityWallet/identityWallet'
 
 import { RedisApi, RequestWithInteractionTokens } from '../types'
-import {
-  credentialRequirements,
-  currentCredentialRequirements,
-  password,
-  serviceUrl
-} from '../config'
+import { credentialRequirements, password, serviceUrl } from '../config'
 import {
   extractDataFromClaims,
   generateRequirementsFromConfig,
@@ -29,7 +24,7 @@ const generateCredentialShareRequest = (
   const queryTypes: string[] = req.query.types.split(',')
   const callbackURL = `${serviceUrl}${Endpoints.share}`
 
-  if (areTypesAvailable(queryTypes, credentialRequirements)) {
+  if (!areTypesAvailable(queryTypes, credentialRequirements)) {
     return res.status(500).send({ error: 'Credential Type not found' })
   }
 
