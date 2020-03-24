@@ -72,7 +72,10 @@ const shareSocketConnectionHandler = (
   dbWatcher: DbWatcher,
   redis: RedisApi
 ) => async (socket: Socket) => {
-  const { identifier, qrCode } = await getQrEncodedToken(Endpoints.share)
+  const { types } = socket.handshake.query
+  const { identifier, qrCode } = await getQrEncodedToken(
+    `${Endpoints.share}?types=${types}`
+  )
   socket.emit(SocketEvents.qrCode, { qrCode, identifier })
   watchDbForUpdate(identifier, dbWatcher, redis, socket)
 }

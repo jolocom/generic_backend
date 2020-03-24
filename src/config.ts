@@ -19,7 +19,7 @@ export const seed = Buffer.from(
 export const password = 'correct horse battery staple'
 
 /* Where is your service deployed. E.g. https://demo-sso.jolocom.com, used by the frontend */
-export const serviceUrl = process.env.SERVICE_URL || 'http://192.168.0.4:9000'
+export const serviceUrl = process.env.SERVICE_URL || 'http://192.168.0.3:9000'
 
 const genericRenderInfo = {
   logo: {
