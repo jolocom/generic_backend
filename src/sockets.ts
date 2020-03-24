@@ -56,10 +56,12 @@ const credOfferSocketConnectionHandler = (
   dbWatcher: DbWatcher,
   redis: RedisApi
 ) => async (socket: Socket) => {
-  const { types, data } = socket.handshake.query
-  const { identifier, qrCode } = await getQrEncodedToken(
-    `${Endpoints.receive}?types=${types}`
-  )
+  const { types, invalid, data } = socket.handshake.query
+  let endpoint = `${Endpoints.receive}?types=${types}`
+
+  if (invalid) endpoint = endpoint.concat(`&invalid=${invalid}`)
+
+  const { identifier, qrCode } = await getQrEncodedToken(endpoint)
   await setDataFromUiForms(redis, identifier, data)
 
   socket.emit(SocketEvents.qrCode, { qrCode, identifier })
