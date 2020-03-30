@@ -41,7 +41,7 @@ const consumeAuthenticationResponse = (
   const { description: resDescription } = request.serviceRequestToken
     .interactionToken as Authentication
 
-  if (reqDescription === resDescription) {
+  if (reqDescription !== resDescription) {
     return response
       .status(401)
       .send('The received description does not match the requested one')

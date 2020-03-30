@@ -19,7 +19,7 @@ export const seed = Buffer.from(
 export const password = 'correct horse battery staple'
 
 /* Where is your service deployed. E.g. https://demo-sso.jolocom.com, used by the frontend */
-export const serviceUrl = process.env.SERVICE_URL || 'http://192.168.0.3:9000'
+export const serviceUrl = process.env.SERVICE_URL || 'http://localhost:9000'
 
 const genericRenderInfo = {
   logo: {
@@ -123,13 +123,13 @@ export const credentialOffers = {
 /* Credentials offered to users */
 export const credentialRequirements = {
   email: {
-    metadata: claimsMetadata.emailAddress,
+    metadata: claimsMetadata.emailAddress
     // example email validation with specific domains
     // credentialValidator: validateEmailCredential(['@jolocom.com', '@jolocom.io']),
     // or with specific emails
     // credentialValidator: validateEmailCredential(['dev@jolocom.com'])
     // or just any valid email
-    credentialValidator: validateEmailCredential()
+    // credentialValidator: validateEmailCredential()
   },
   FirstCredential: {
     metadata: {
