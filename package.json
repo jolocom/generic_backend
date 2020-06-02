@@ -8,7 +8,8 @@
     "start": "yarn run redis:start; yarn run server; yarn run redis:stop",
     "server": "node ./build/server.js",
     "redis:start": "redis-server &",
-    "redis:stop": "redis-cli SHUTDOWN"
+    "redis:stop": "redis-cli SHUTDOWN",
+    "register": "node ./bin/register.js"
   },
   "dependencies": {
     "axios": "^0.18.1",
@@ -18,7 +19,7 @@
     "cred-types-jolocom-demo": "^0.2.1",
     "email-validator": "^2.0.4",
     "express": "^4.16.3",
-    "jolocom-lib": "3",
+    "jolocom-lib": "^4.1.0",
     "redis": "^2.8.0",
     "socket.io": "^2.2.0",
     "tslib": "^1.9.3",
