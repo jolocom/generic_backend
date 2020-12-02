@@ -1,8 +1,9 @@
-import { RequestWithInteractionTokens, RedisApi } from 'src/types'
-import { Response, NextFunction } from 'express'
+import { RedisApi } from 'src/types'
+import { Request, Response, NextFunction } from 'express'
+import { Agent } from '@jolocom/sdk'
 
-export const addCustomAuthnMiddleware = (redis: RedisApi) => async (
-  req: RequestWithInteractionTokens,
+export const addCustomAuthnMiddleware = (agent: Agent, redis: RedisApi) => async (
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {

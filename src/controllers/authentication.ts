@@ -1,4 +1,4 @@
-import { IdentityWallet } from 'jolocom-lib/js/identityWallet/identityWallet'
+import { Agent } from '@jolocom/sdk'
 import { RedisApi, RequestWithInteractionTokens } from 'src/types'
 import { Request, Response } from 'express'
 import { password, serviceUrl } from '../config'
@@ -6,19 +6,18 @@ import { setStatusPending, setStatusDone } from '../helpers'
 import { Authentication } from 'jolocom-lib/js/interactionTokens/authentication'
 
 const generateAuthenticationRequest = (
-  identityWallet: IdentityWallet,
+  agent: Agent,
   redis: RedisApi
 ) => async (req: Request, res: Response) => {
   const description = req.query.desc || 'Some random action'
   const callbackURL = `${serviceUrl}/auth`
 
   try {
-    const authRequest = await identityWallet.create.interactionTokens.request.auth(
+    const authRequest = await agent.authRequestToken(
       {
         callbackURL,
         description
-      },
-      password
+      }
     )
 
     const token = authRequest.encode()
@@ -32,25 +31,19 @@ const generateAuthenticationRequest = (
 }
 
 const consumeAuthenticationResponse = (
-  identityWallet: IdentityWallet,
+  agent: Agent,
   redis: RedisApi
-) => async (request: RequestWithInteractionTokens, response: Response) => {
-  const { nonce } = request.serviceRequestToken
-  const { description: reqDescription } = request.userResponseToken
-    .interactionToken as Authentication
-  const { description: resDescription } = request.serviceRequestToken
-    .interactionToken as Authentication
+) => async (request: Request, response: Response) => {
+  try {
+    const authInteraction = await agent.processJWT(request.body.token!)
 
-  if (reqDescription !== resDescription) {
+    await setStatusDone(redis, authInteraction.id)
+    return response.status(200).send()
+  } catch (err) {
     return response
       .status(401)
-      .send('The received description does not match the requested one')
+      .send(err.toString())
   }
-
-  // TODO @clauxx check description ??
-  // to confirm that the user agreed to exactly the action requested
-  await setStatusDone(redis, nonce)
-  return response.status(200).send()
 }
 
 export const authentication = {

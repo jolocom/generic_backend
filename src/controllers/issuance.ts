@@ -1,6 +1,5 @@
-import { credentialOffers, password, serviceUrl } from '../config'
+import { credentialOffers, serviceUrl } from '../config'
 import { Request, Response } from 'express'
-import { IdentityWallet } from 'jolocom-lib/js/identityWallet/identityWallet'
 import { RedisApi, RequestWithInteractionTokens } from '../types'
 import { keyIdToDid } from 'jolocom-lib/js/utils/helper'
 import {
@@ -12,9 +11,10 @@ import {
 import { JSONWebToken } from 'jolocom-lib/js/interactionTokens/JSONWebToken'
 import { CredentialOfferResponse } from 'jolocom-lib/js/interactionTokens/credentialOfferResponse'
 import { SignedCredential } from 'jolocom-lib/js/credentials/signedCredential/signedCredential'
+import { Agent } from '@jolocom/sdk'
 
 const generateCredentialOffer = (
-  identityWallet: IdentityWallet,
+  agent: Agent,
   redis: RedisApi
 ) => async (req: Request, res: Response) => {
   const queryTypes: string[] = req.query.types.split(',')
@@ -28,8 +28,7 @@ const generateCredentialOffer = (
     return res.status(500).send({ error: 'Credential Type not found' })
   }
 
-  try {
-    const credOffer = await identityWallet.create.interactionTokens.request.offer(
+    const credOffer = await agent.credOfferToken(
       {
         callbackURL,
         offeredCredentials: queryTypes.reduce(
@@ -42,49 +41,37 @@ const generateCredentialOffer = (
           ],
           []
         )
-      },
-      password
+      }
     )
 
-    const token = credOffer.encode()
-    await setStatusPending(redis, credOffer.nonce, { request: token })
-    return res.send({ token, identifier: credOffer.nonce })
-  } catch (err) {
-    return res.status(500).send({ error: err.message })
-  }
+  const token = credOffer.encode()
+
+  await setStatusPending(redis, credOffer.nonce, { request: token })
+  return res.send({ token, identifier: credOffer.nonce })
 }
 
 const consumeCredentialOfferResponse = (
-  identityWallet: IdentityWallet,
+  agent: Agent,
   redis: RedisApi
 ) => async (req: RequestWithInteractionTokens, res: Response) => {
-  const credentialOfferResponse = req.userResponseToken as JSONWebToken<
-    CredentialOfferResponse
-  >
-  const selectedOffers =
-    credentialOfferResponse.interactionToken.selectedCredentials
-  const claim = await getDataFromUiForms(redis, credentialOfferResponse.nonce)
+  const offerInteraction = await agent.processJWT(req.body.token!)
 
-  const selectedTypes = selectedOffers.map(offer => offer.type)
+  // @ts-ignore
+  const selectedTypes = offerInteraction.getSummary().state.selectedTypes! as string[]
+  const claim = await getDataFromUiForms(redis, offerInteraction.id)
+
   if (!areTypesAvailable(selectedTypes, credentialOffers)) {
     return res.status(500).send({ error: 'Credential Type not found' })
   }
 
   const providedCredentials = await Promise.all(
-    selectedOffers.reduce<Array<Promise<SignedCredential>>>((acc, offer) => {
-      return [
-        ...acc,
-        identityWallet.create.signedCredential(
-          {
-            metadata: credentialOffers[offer.type].schema,
-
+    selectedTypes.map((typ: string) =>
+        agent.signedCredential({
+            metadata: credentialOffers[typ].schema,
             claim: { ...claim, message: 'Thank you for testing the endpoint' },
-            subject: keyIdToDid(credentialOfferResponse.issuer)
-          },
-          password
-        )
-      ]
-    }, [])
+            subject: offerInteraction.participants.responder.did
+        })
+    )
   )
 
   const invalidTypes: string[] | undefined =
@@ -98,15 +85,12 @@ const consumeCredentialOfferResponse = (
     })
   }
 
-  const credentialReceive = await identityWallet.create.interactionTokens.response.issue(
-    {
-      signedCredentials: providedCredentials.map(cred => cred.toJSON())
-    },
-    password,
-    credentialOfferResponse
+
+  const credentialReceive = await offerInteraction.createCredentialReceiveToken(
+    providedCredentials
   )
 
-  await setStatusDone(redis, credentialOfferResponse.nonce)
+  await setStatusDone(redis, offerInteraction.id)
   return res.json({ token: credentialReceive.encode() })
 }
 
