@@ -14,8 +14,9 @@ export enum SocketEvents {
 }
 
 export enum Endpoints {
-  authn = '/authenticate/',
-  receive = '/receive/'
+  share = '/share',
+  auth = '/auth',
+  receive = '/receive'
 }
 
 export const configureSockets = (
@@ -24,38 +25,57 @@ export const configureSockets = (
   dbWatcher: DbWatcher
 ) => {
   const baseSocket = io(server)
-  const authnSocket = baseSocket.of(Endpoints.authn)
+  const shareSocket = baseSocket.of(Endpoints.share)
   const receiveCredSocket = baseSocket.of(Endpoints.receive)
+  const authSocket = baseSocket.of(Endpoints.auth)
 
-  authnSocket.on(
+  shareSocket.on(
     SocketEvents.connection,
-    authSocketConnectionHandler(dbWatcher, redis)
+    shareSocketConnectionHandler(dbWatcher, redis)
   )
   receiveCredSocket.on(
     SocketEvents.connection,
     credOfferSocketConnectionHandler(dbWatcher, redis)
   )
-}
-
-const credOfferSocketConnectionHandler = (
-  dbWatcher: DbWatcher,
-  redis: RedisApi
-) => async (socket: Socket) => {
-  const { credentialType, data } = socket.handshake.query
-  const { identifier, qrCode } = await getQrEncodedToken(
-    `${Endpoints.receive}${credentialType}`
+  authSocket.on(
+    SocketEvents.connection,
+    authSocketConnectionHandler(dbWatcher, redis)
   )
-  await setDataFromUiForms(redis, identifier, data)
-
-  socket.emit(SocketEvents.qrCode, { qrCode, identifier })
-  watchDbForUpdate(identifier, dbWatcher, redis, socket)
 }
 
 const authSocketConnectionHandler = (
   dbWatcher: DbWatcher,
   redis: RedisApi
 ) => async (socket: Socket) => {
-  const { identifier, qrCode } = await getQrEncodedToken(Endpoints.authn)
+  const { identifier, qrCode } = await getQrEncodedToken(Endpoints.auth)
+  socket.emit(SocketEvents.qrCode, { qrCode, identifier })
+  watchDbForUpdate(identifier, dbWatcher, redis, socket)
+}
+
+const credOfferSocketConnectionHandler = (
+  dbWatcher: DbWatcher,
+  redis: RedisApi
+) => async (socket: Socket) => {
+  const { types, invalid, data } = socket.handshake.query
+  let endpoint = `${Endpoints.receive}?types=${types}`
+
+  if (invalid) endpoint = endpoint.concat(`&invalid=${invalid}`)
+
+  const { identifier, qrCode } = await getQrEncodedToken(endpoint)
+  await setDataFromUiForms(redis, identifier, data)
+
+  socket.emit(SocketEvents.qrCode, { qrCode, identifier })
+  watchDbForUpdate(identifier, dbWatcher, redis, socket)
+}
+
+const shareSocketConnectionHandler = (
+  dbWatcher: DbWatcher,
+  redis: RedisApi
+) => async (socket: Socket) => {
+  const { types } = socket.handshake.query
+  const { identifier, qrCode } = await getQrEncodedToken(
+    `${Endpoints.share}?types=${types}`
+  )
   socket.emit(SocketEvents.qrCode, { qrCode, identifier })
   watchDbForUpdate(identifier, dbWatcher, redis, socket)
 }

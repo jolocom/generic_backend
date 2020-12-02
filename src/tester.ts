@@ -52,7 +52,7 @@ export const testCredentialReceive = async () => {
 export const testCredentialRequest = async () => {
   const identityWallet = await getIdentityWallet()
 
-  const { token } = (await axios.get(`${serviceUrl}${Endpoints.authn}`)).data
+  const { token } = (await axios.get(`${serviceUrl}${Endpoints.share}`)).data
   const credentialRequest: JSONWebToken<
     CredentialRequest
   > = JolocomLib.parse.interactionToken.fromJWT(token)

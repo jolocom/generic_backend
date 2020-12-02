@@ -2,6 +2,7 @@ import { Express } from 'express'
 import { IdentityWallet } from 'jolocom-lib/js/identityWallet/identityWallet'
 import { registration } from './controllers/registration'
 import { issuance } from './controllers/issuance'
+import { authentication } from './controllers/authentication'
 import { RedisApi } from './types'
 import { Endpoints } from './sockets'
 import {
@@ -17,7 +18,7 @@ export const configureDefaultRoutes = (
   identityWallet: IdentityWallet
 ) => {
   app
-    .route(Endpoints.authn)
+    .route(Endpoints.share)
     .get(registration.generateCredentialShareRequest(identityWallet, redis))
     .post(
       validateSentInteractionToken,
@@ -28,11 +29,20 @@ export const configureDefaultRoutes = (
     )
 
   app
-    .route(`${Endpoints.receive}:credentialType`)
+    .route(Endpoints.receive)
     .get(issuance.generateCredentialOffer(identityWallet, redis))
     .post(
       validateSentInteractionToken,
       matchAgainstRequest(redis),
       issuance.consumeCredentialOfferResponse(identityWallet, redis)
+    )
+
+  app
+    .route(Endpoints.auth)
+    .get(authentication.generateAuthenticationRequest(identityWallet, redis))
+    .post(
+      validateSentInteractionToken,
+      matchAgainstRequest(redis),
+      authentication.consumeAuthenticationResponse(identityWallet, redis)
     )
 }
