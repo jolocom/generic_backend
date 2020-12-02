@@ -11,12 +11,16 @@ import { validateEmailCredential } from './helpers/validators';
  * The seed to instantiate a vaulted key provider and password for seed encryption / decryption
  * The need to persist the seed in clear text will be addressed in the next minor release
  */
-export const seed = Buffer.from(
-  'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-  'hex'
-)
+export const seedPhrase =
+  'sample issue vendor usual train lunar observe cupboard satoshi suspect sight claw'
 
 export const password = 'correct horse battery staple'
+
+export const dbConf = {
+  type: 'sqlite',
+  database: './db.sqlite3',
+  logging: ['error', 'warn', 'schema'],
+}
 
 /* Where is your service deployed. E.g. https://demo-sso.jolocom.com, used by the frontend */
 export const serviceUrl = process.env.SERVICE_URL || 'http://localhost:9000'

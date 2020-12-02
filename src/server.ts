@@ -1,34 +1,31 @@
-import { JolocomLib } from 'jolocom-lib'
 import * as http from 'http'
 import { configureDefaultRoutes } from './routes'
 import { getConfiguredApp } from './app'
-import { initializeRedisClient } from './redis'
-import { password, seed } from './config'
+import { password, seedPhrase, dbConf } from './config'
 import { configureSockets } from './sockets'
-import { DbWatcher } from './dbWatcher'
 import { configureCustomRoutes } from './customHandlers/customRoutes'
+import { JolocomSDK } from '@jolocom/sdk'
+import { JolocomTypeormStorage } from '@jolocom/sdk-storage-typeorm'
+import { createConnection } from 'typeorm'
 
 const app = getConfiguredApp()
 const server = new http.Server(app)
-const redis = initializeRedisClient()
 
-const registry = JolocomLib.registries.jolocom.create()
-const vaultedKeyProvider = JolocomLib.KeyProvider.fromSeed(seed, password)
-const dbWatcher = new DbWatcher(redis.getAsync)
+const sdk = new JolocomSDK({
+  storage: new JolocomTypeormStorage(createConnection({
+    ...dbConf,
+    entities: ['node_modules/@jolocom/sdk-storage-typeorm/js/src/entities/*.js'],
+    synchronize: true,
+  }))
+})
 
-registry
-  .authenticate(vaultedKeyProvider, {
-    derivationPath: JolocomLib.KeyTypes.jolocomIdentityKey,
-    encryptionPass: password
-  })
-  .then(identityWallet => {
-    configureDefaultRoutes(app, redis, identityWallet)
-    configureCustomRoutes(app, redis)
-    configureSockets(server, redis, dbWatcher)
-    server.listen(9000)
-  })
-  .catch(err => {
-    console.error(err)
-    console.trace()
-    process.exit(1)
-  })
+sdk.createAgentFromMnemonic(seedPhrase, false, password).then(agent => {
+  configureDefaultRoutes(app, agent)
+  configureCustomRoutes(app, agent)
+  configureSockets(server)
+  server.listen(9000)
+}).catch(err => {
+  console.error(err)
+  console.trace()
+  process.exit(1)
+})
