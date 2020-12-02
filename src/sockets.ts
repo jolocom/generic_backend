@@ -1,4 +1,4 @@
-import { SSO } from 'jolocom-lib/js/sso/sso'
+import QRCode from 'qrcode'
 import * as io from 'socket.io'
 import { serviceUrl } from './config'
 import * as http from 'http'
@@ -84,7 +84,7 @@ const getQrEncodedToken = async (endpoint: string) => {
   const { identifier, token } = (await axios.get(
     `${serviceUrl}${endpoint}`
   )).data
-  return { identifier, qrCode: await new SSO().JWTtoQR(token) }
+  return { identifier, qrCode: await QRCode.toDataURL(token) }
 }
 
 const watchDbForUpdate = (
